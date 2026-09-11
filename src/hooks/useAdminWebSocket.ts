@@ -8,7 +8,7 @@ import SockJS from "sockjs-client";
 // Types mirroring the backend DTOs
 // ──────────────────────────────────────────────────────────────────────────────
 export type WsAdminMetric = { label: string; value: number };
-export type WsAdminTable  = { name: string; rows: number; status: string };
+export type WsAdminTable = { name: string; rows: number; status: string };
 export type WsAdminDashboard = { metrics: WsAdminMetric[]; tables: WsAdminTable[] };
 
 export type WsAdminUser = {
@@ -46,9 +46,9 @@ export type ConnectionStatus = "connecting" | "connected" | "disconnected";
 // ──────────────────────────────────────────────────────────────────────────────
 export interface AdminWebSocketHandlers {
     onDashboardUpdate?: (dashboard: WsAdminDashboard) => void;
-    onUsersUpdate?:     (users: WsAdminUser[]) => void;
-    onNewImage?:        (item: WsVisualItem) => void;
-    onImageDeleted?:    (id: number) => void;
+    onUsersUpdate?: (users: WsAdminUser[]) => void;
+    onNewImage?: (item: WsVisualItem) => void;
+    onImageDeleted?: (id: number) => void;
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -118,7 +118,7 @@ export function useAdminWebSocket(handlers: AdminWebSocketHandlers): ConnectionS
             },
 
             onDisconnect: () => setStatus("disconnected"),
-            onStompError:  () => setStatus("disconnected"),
+            onStompError: () => setStatus("disconnected"),
             onWebSocketError: () => setStatus("disconnected"),
             onWebSocketClose: () => setStatus("disconnected"),
         });
