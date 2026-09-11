@@ -162,9 +162,6 @@ export default function Home() {
           <Link className="shrink-0 hover:opacity-90 transition" href="/" aria-label="Chitram home">
             <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
           </Link>
-          <span className="hidden sm:inline-block rounded-full bg-[#e8e0d4] px-3 py-1 text-xs font-semibold text-[#68736d]">
-            Supabase Cloud
-          </span>
         </div>
 
         <div className="mx-6 hidden min-w-0 max-w-xl flex-1 lg:block">
@@ -289,19 +286,19 @@ export default function Home() {
           </div>
         )}
         <MasonryFeed
-            items={items}
-            isLoading={loadingItems}
-            isLoadingMore={loadingMore}
-            hasMore={hasMore}
-            onLoadMore={handleLoadMore}
-            currentUserId={currentUser?.id}
-            isAdmin={currentUser?.isAdmin}
-            onDeletePin={handleDeletePin}
-            onEditPin={handleEditPin}
-            savedPinIds={savedPinIds}
-            onSaveToggle={handleSaveToggle}
-            emptyTitle={selectedCategory === "All" ? "No posts available yet" : `No posts in ${selectedCategory}`}
-            emptySubtitle="Be the first to share an image in this category!"
+          items={items}
+          isLoading={loadingItems}
+          isLoadingMore={loadingMore}
+          hasMore={hasMore}
+          onLoadMore={handleLoadMore}
+          currentUserId={currentUser?.id}
+          isAdmin={currentUser?.isAdmin}
+          onDeletePin={handleDeletePin}
+          onEditPin={handleEditPin}
+          savedPinIds={savedPinIds}
+          onSaveToggle={handleSaveToggle}
+          emptyTitle={selectedCategory === "All" ? "No posts available yet" : `No posts in ${selectedCategory}`}
+          emptySubtitle="Be the first to share an image in this category!"
         />
       </section>
 
