@@ -185,7 +185,7 @@ export default function Home() {
             <>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="inline-flex h-9 w-9 translate-y-0.5 items-center justify-center rounded-full bg-[#d2643b] text-lg font-bold leading-none text-white shadow-sm hover:bg-[#b85029] active:scale-95 transition sm:h-auto sm:w-auto sm:gap-2 sm:px-4 sm:py-2 sm:text-xs"
+                className="hidden h-9 w-9 translate-y-0.5 items-center justify-center rounded-full bg-[#d2643b] text-lg font-bold leading-none text-white shadow-sm hover:bg-[#b85029] active:scale-95 transition sm:inline-flex sm:h-auto sm:w-auto sm:gap-2 sm:px-4 sm:py-2 sm:text-xs"
                 aria-label="Create post"
               >
                 <span className="sm:hidden">+</span>
