@@ -9,6 +9,8 @@ interface PinCardProps {
   currentUserId?: number | null;
   isAdmin?: boolean;
   onDelete?: (id: number) => void;
+  onEdit?: (item: VisualItem) => Promise<VisualItem>;
+  isOwnerFeed?: boolean;
   initiallySaved?: boolean;
   onSaveToggle?: (id: number, shouldSave: boolean) => Promise<void>;
 }
@@ -18,6 +20,8 @@ export function PinCard({
   currentUserId,
   isAdmin,
   onDelete,
+  onEdit,
+  isOwnerFeed = false,
   initiallySaved = false,
   onSaveToggle,
 }: PinCardProps) {
@@ -27,6 +31,13 @@ export function PinCard({
   const [showMenu, setShowMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [editTitle, setEditTitle] = useState(item.title);
+  const [editCategory, setEditCategory] = useState(item.category);
+  const [editDescription, setEditDescription] = useState(item.description ?? "");
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Calculate precise aspect ratio to eliminate layout shifts (CLS = 0)
@@ -39,6 +50,7 @@ export function PinCard({
   const canDelete = Boolean(
     (currentUserId && item.uploadedBy && currentUserId === item.uploadedBy) || isAdmin
   );
+  const canEdit = Boolean(onEdit && (isOwnerFeed || (currentUserId && item.uploadedBy && currentUserId === item.uploadedBy) || isAdmin));
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -62,17 +74,42 @@ export function PinCard({
     }, 1500);
   };
 
-  const handleDownload = (e: React.MouseEvent) => {
+  const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowMenu(false);
-    const a = document.createElement("a");
-    a.href = item.imageUrl;
-    a.download = `${item.title.replace(/\s+/g, "_") || "chitram_post"}.jpg`;
-    a.target = "_blank";
-    a.rel = "noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    setIsDownloading(true);
+    try {
+      const response = await fetch(item.imageUrl);
+      if (!response.ok) throw new Error("Download failed");
+      const blobUrl = URL.createObjectURL(await response.blob());
+      const anchor = document.createElement("a");
+      anchor.href = blobUrl;
+      anchor.download = `${item.title.replace(/\s+/g, "_") || "chitram_post"}.${item.mimeType?.split("/")[1] || "jpg"}`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(blobUrl);
+      setShowMenu(false);
+    } catch {
+      setSaveError("Could not download this image. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!onEdit || !editTitle.trim()) return;
+    setIsSavingEdit(true);
+    setEditError(null);
+    try {
+      await onEdit({ ...item, title: editTitle.trim(), category: editCategory, description: editDescription.trim() || null });
+      setShowEdit(false);
+      setShowMenu(false);
+    } catch {
+      setEditError("Could not update this post. Please try again.");
+    } finally {
+      setIsSavingEdit(false);
+    }
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -90,11 +127,11 @@ export function PinCard({
   };
 
   return (
-    <div className="break-inside-avoid mb-5 group">
+    <div className="group mb-3 break-inside-avoid sm:mb-5">
       {/* Visual Image Container with reserved aspect ratio */}
-      <div className="relative rounded-3xl bg-[#e6e0d6] shadow-sm hover:shadow-[0_16px_36px_rgba(31,41,37,0.12)] transition-all duration-300 transform group-hover:-translate-y-0.5">
+      <div className="relative rounded-2xl bg-[#e6e0d6] shadow-sm hover:shadow-[0_16px_36px_rgba(31,41,37,0.12)] transition-all duration-300 transform group-hover:-translate-y-0.5 sm:rounded-3xl">
         <div
-          className="relative w-full overflow-hidden rounded-3xl"
+          className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl"
           style={{ aspectRatio: `${ratio}` }}
         >
           {/* Shimmer skeleton until image loads */}
@@ -140,7 +177,7 @@ export function PinCard({
               type="button"
               disabled={!currentUserId || isSaving}
               title={!currentUserId ? "Sign in to save this post" : undefined}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition-all shadow-md active:scale-90 ${initiallySaved
+              className={`px-2.5 py-1.5 rounded-full text-[11px] font-bold transition-all shadow-md active:scale-90 sm:px-4 sm:py-2 sm:text-xs ${initiallySaved
                 ? "bg-[#1f2925] text-white"
                 : "bg-[#d2643b] text-white hover:bg-[#b85029]"
                 } disabled:opacity-60 disabled:cursor-not-allowed`}
@@ -193,11 +230,28 @@ export function PinCard({
               </button>
               <button
                 onClick={handleDownload}
+                disabled={isDownloading}
                 className="flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-[#f5f1e9]"
               >
-                <span>Download Image</span>
+                <span>{isDownloading ? "Downloading..." : "Download Image"}</span>
                 <span>↓</span>
               </button>
+              {canEdit && (
+                <button
+                  onClick={() => {
+                    setEditTitle(item.title);
+                    setEditCategory(item.category);
+                    setEditDescription(item.description ?? "");
+                    setEditError(null);
+                    setShowEdit(true);
+                    setShowMenu(false);
+                  }}
+                  className="flex w-full items-center justify-between border-t border-[#f0eee6] px-4 py-2 text-left transition hover:bg-[#f5f1e9]"
+                >
+                  <span>Edit details</span>
+                  <span>✎</span>
+                </button>
+              )}
               {canDelete && (
                 <button
                   onClick={handleDelete}
@@ -213,11 +267,44 @@ export function PinCard({
         </div>
       </div>
 
+      {showEdit && (
+        <form onSubmit={handleEditSubmit} className="mt-3 rounded-2xl border border-[#e4dcd3] bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <h4 className="text-sm font-bold text-[#1f2925]">Edit post details</h4>
+            <button type="button" onClick={() => setShowEdit(false)} className="text-xs font-semibold text-[#68736d]">Cancel</button>
+          </div>
+          <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required maxLength={120} className="mt-3 w-full rounded-xl border border-[#d8ded8] px-3 py-2 text-sm outline-none focus:border-[#1f2925]" placeholder="Post title" />
+          <select value={editCategory} onChange={(e) => setEditCategory(e.target.value)} className="mt-2 w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm outline-none focus:border-[#1f2925]">
+            {['Photography', 'Travel', 'Architecture', 'Nature', 'Art & Design', 'Lifestyle', 'Culture'].map((category) => <option key={category}>{category}</option>)}
+          </select>
+          <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} maxLength={500} rows={2} className="mt-2 w-full resize-none rounded-xl border border-[#d8ded8] px-3 py-2 text-sm outline-none focus:border-[#1f2925]" placeholder="Description (optional)" />
+          {editError && <p className="mt-2 text-xs font-medium text-[#a84f37]">{editError}</p>}
+          <button type="submit" disabled={isSavingEdit} className="mt-3 w-full rounded-xl bg-[#1f2925] px-3 py-2 text-xs font-bold text-white disabled:opacity-50">{isSavingEdit ? "Saving..." : "Save details"}</button>
+        </form>
+      )}
+
       {/* Pin Meta Footer */}
       <div className="mt-2.5 px-1">
-        <h3 className="text-sm font-bold text-[#1f2925] leading-snug line-clamp-2">
-          {item.title}
-        </h3>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="min-w-0 text-sm font-bold leading-snug text-[#1f2925] line-clamp-2">
+            {item.title}
+          </h3>
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => {
+                setEditTitle(item.title);
+                setEditCategory(item.category);
+                setEditDescription(item.description ?? "");
+                setEditError(null);
+                setShowEdit(true);
+              }}
+              className="shrink-0 rounded-full border border-[#d8ded8] px-2.5 py-1 text-[10px] font-bold text-[#68736d] transition hover:border-[#1f2925] hover:text-[#1f2925]"
+            >
+              Edit
+            </button>
+          )}
+        </div>
 
         {item.description && (
           <p className="mt-0.5 text-xs text-[#68736d] line-clamp-1">

@@ -59,7 +59,7 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
 
     return (
         <section className="mt-6 overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
-            <div className="flex items-center justify-between border-b border-[#e8ece8] px-6 py-5">
+            <div className="flex flex-col items-start gap-3 border-b border-[#e8ece8] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
                 <div>
                     <h2 className="font-semibold">User access</h2>
                     <p className="mt-1 text-sm text-[#68736d]">Manage roles for accounts that have signed in with Google.</p>
@@ -71,7 +71,7 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
                     </span>
                 )}
             </div>
-            {error && <p className="border-b border-[#e8b9ad] bg-[#fff5f2] px-6 py-4 text-sm text-[#a84f37]">{error}</p>}
+            {error && <p className="border-b border-[#e8b9ad] bg-[#fff5f2] px-4 py-4 text-sm text-[#a84f37] sm:px-6">{error}</p>}
             <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] text-left text-sm">
                     <thead className="bg-[#f8faf7] text-xs uppercase tracking-[0.12em] text-[#68736d]">

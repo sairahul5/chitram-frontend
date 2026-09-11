@@ -28,7 +28,6 @@ export default function Home() {
 
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchMode, setSearchMode] = useState<"posts" | "accounts">("posts");
   const [accountResults, setAccountResults] = useState<AccountSearchResult[]>([]);
 
   const [currentUser, setCurrentUser] = useState<{
@@ -81,20 +80,16 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (searchMode === "accounts") {
-      const query = searchQuery.trim().replace(/^@/, "");
-      if (!query) {
-        return;
-      }
-      apiClient<AccountSearchResult[]>(`/user/search?query=${encodeURIComponent(query)}`)
+    const accountQuery = searchQuery.trim().replace(/^@/, "");
+    if (accountQuery) {
+      apiClient<AccountSearchResult[]>(`/user/search?query=${encodeURIComponent(accountQuery)}`)
         .then(setAccountResults)
-        .catch(() => setAccountResults([]))
-        .finally(() => setLoadingItems(false));
-      return;
+        .catch(() => setAccountResults([]));
+    } else {
+      setAccountResults([]);
     }
-
     loadFeed(selectedCategory === "All" ? searchQuery : selectedCategory);
-  }, [selectedCategory, searchMode, searchQuery, loadFeed]);
+  }, [selectedCategory, searchQuery, loadFeed]);
 
   useEffect(() => {
     apiClient<{ id: number; name: string; email: string; pictureUrl?: string | null; username?: string | null; isAdmin?: boolean }>("/user/profile")
@@ -146,6 +141,15 @@ export default function Home() {
     }
   };
 
+  const handleEditPin = async (updated: VisualItem) => {
+    const saved = await apiClient<VisualItem>(`/visual-items/${updated.id}`, {
+      method: "PUT",
+      body: JSON.stringify({ title: updated.title, category: updated.category, description: updated.description }),
+    });
+    setItems((prev) => prev.map((item) => item.id === saved.id ? saved : item));
+    return saved;
+  };
+
   const handlePinCreated = (newPin: VisualItem) => {
     setItems((prev) => [newPin, ...prev]);
   };
@@ -153,40 +157,42 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#f5f1e9] px-4 py-6 text-[#1f2925] sm:px-8 lg:px-12">
       {/* Header */}
-      <header className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-        <div className="flex items-center gap-6">
-          <Link className="text-2xl font-bold tracking-tight text-[#1f2925] hover:opacity-90 transition" href="/">
-            Chitram
+      <header className="mx-auto flex max-w-7xl items-center justify-between gap-3">
+        <div className="min-w-0 flex items-center gap-6">
+          <Link className="shrink-0 hover:opacity-90 transition" href="/" aria-label="Chitram home">
+            <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
           </Link>
           <span className="hidden sm:inline-block rounded-full bg-[#e8e0d4] px-3 py-1 text-xs font-semibold text-[#68736d]">
             Supabase Cloud
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="shrink-0 flex items-center gap-2 sm:gap-3">
           {loadingUser ? (
             <div className="h-9 w-24 rounded-full bg-[#e5ded4] animate-pulse" />
           ) : currentUser ? (
             <>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="hidden sm:inline-flex items-center gap-2 rounded-full bg-[#d2643b] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#b85029] active:scale-95 transition"
+                className="inline-flex h-9 w-9 translate-y-0.5 items-center justify-center rounded-full bg-[#d2643b] text-lg font-bold leading-none text-white shadow-sm hover:bg-[#b85029] active:scale-95 transition sm:h-auto sm:w-auto sm:gap-2 sm:px-4 sm:py-2 sm:text-xs"
+                aria-label="Create post"
               >
-                <span>+ Create Post</span>
+                <span className="sm:hidden">+</span>
+                <span className="hidden sm:inline">+ Create Post</span>
               </button>
 
               <Link
-                className="flex items-center gap-2 rounded-full bg-[#1f2925] pl-2 pr-4 py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#2e3b36] transition shadow-sm"
+                className="flex max-w-[124px] items-center gap-2 rounded-full bg-[#1f2925] pl-1.5 pr-2.5 py-1.5 text-xs font-semibold text-white hover:bg-[#2e3b36] transition shadow-sm sm:max-w-none sm:pr-4 sm:text-sm"
                 href="/user"
               >
                 <Avatar src={currentUser.pictureUrl} name={currentUser.name} size="sm" />
-                <span className="max-w-[120px] sm:max-w-[160px] truncate">
+                <span className="max-w-[72px] truncate sm:max-w-[160px]">
                   {currentUser.username ? `@${currentUser.username}` : currentUser.name}
                 </span>
               </Link>
 
               <button
-                className="rounded-full border border-[#d2643b] bg-white px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-[#a84f37] hover:bg-[#fff5f2] hover:border-[#b85029] hover:text-[#8f402e] transition"
+                className="rounded-full border border-[#d2643b] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#a84f37] hover:bg-[#fff5f2] hover:border-[#b85029] hover:text-[#8f402e] transition sm:px-4 sm:py-2 sm:text-sm"
                 onClick={handleLogout}
                 type="button"
               >
@@ -205,45 +211,22 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="mx-auto max-w-7xl py-10 sm:py-14 animate-fade-in">
-        <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.24em] text-[#d2643b]">
-          Visual Discovery & Curation
-        </p>
-        <h1 className="mt-3 max-w-3xl text-4xl font-extrabold tracking-tight text-[#1f2925] sm:text-6xl lg:text-7xl">
-          Find something worth keeping.
-        </h1>
-        <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-[#68736d]">
-          Browse photography, architecture, and art with preserved original aspect ratios stored live in Supabase Storage.
-        </p>
-
-        <div className="mt-7 flex max-w-2xl flex-col gap-3 sm:flex-row">
+      <section className="mx-auto max-w-7xl py-5 sm:py-8 animate-fade-in">
+        <div className="flex max-w-2xl flex-col gap-2.5 sm:flex-row">
           <div className="relative flex-1">
             <input
               type="search"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={searchMode === "posts" ? "Search posts by title or category" : "Search accounts by name or username"}
+              placeholder="Search posts or accounts"
               className="w-full rounded-2xl border border-[#d8ded8] bg-white px-4 py-3 text-sm text-[#1f2925] shadow-sm outline-none transition placeholder:text-[#98a39c] focus:border-[#d2643b]"
-              aria-label={searchMode === "posts" ? "Search posts" : "Search accounts"}
+              aria-label="Search posts or accounts"
             />
-          </div>
-          <div className="flex rounded-2xl border border-[#d8ded8] bg-white p-1 shadow-sm">
-            {(["posts", "accounts"] as const).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                onClick={() => setSearchMode(mode)}
-                className={`rounded-xl px-4 py-2 text-xs font-bold capitalize transition ${searchMode === mode ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:text-[#1f2925]"
-                  }`}
-              >
-                {mode}
-              </button>
-            ))}
           </div>
         </div>
 
         {/* Category Filter Chips */}
-        <div className="mt-8 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="mt-5 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
@@ -271,18 +254,11 @@ export default function Home() {
 
       {/* Pinterest-style Masonry Feed */}
       <section className="mx-auto max-w-7xl">
-        {searchMode === "accounts" ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {!searchQuery.trim() ? (
-              <p className="col-span-full rounded-3xl border border-dashed border-[#ccd4cd] bg-white/60 p-10 text-center text-sm text-[#68736d]">
-                Search for an account by name or username.
-              </p>
-            ) : accountResults.length === 0 ? (
-              <p className="col-span-full rounded-3xl border border-dashed border-[#ccd4cd] bg-white/60 p-10 text-center text-sm text-[#68736d]">
-                No accounts found.
-              </p>
-            ) : (
-              accountResults.map((account) => (
+        {accountResults.length > 0 && (
+          <div className="mb-8">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-[#68736d]">Accounts</p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {accountResults.map((account) => (
                 <Link
                   key={account.id}
                   href={`/account/${account.id}`}
@@ -297,11 +273,11 @@ export default function Home() {
                     <span className="mt-1 block text-[11px] text-[#68736d]">{account.followersCount} followers</span>
                   </span>
                 </Link>
-              ))
-            )}
+              ))}
+            </div>
           </div>
-        ) : (
-          <MasonryFeed
+        )}
+        <MasonryFeed
             items={items}
             isLoading={loadingItems}
             isLoadingMore={loadingMore}
@@ -310,12 +286,12 @@ export default function Home() {
             currentUserId={currentUser?.id}
             isAdmin={currentUser?.isAdmin}
             onDeletePin={handleDeletePin}
+            onEditPin={handleEditPin}
             savedPinIds={savedPinIds}
             onSaveToggle={handleSaveToggle}
             emptyTitle={selectedCategory === "All" ? "No posts available yet" : `No posts in ${selectedCategory}`}
             emptySubtitle="Be the first to share an image in this category!"
-          />
-        )}
+        />
       </section>
 
       {/* Upload Pin Modal */}

@@ -178,7 +178,7 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
       }}
     >
       <div
-        className="relative w-full max-w-2xl rounded-3xl bg-white p-6 sm:p-8 shadow-2xl border border-[#e4dcd3] my-8 animate-scale-in"
+        className="relative my-2 max-h-[calc(100dvh-1rem)] w-full max-w-2xl overflow-y-auto rounded-3xl border border-[#e4dcd3] bg-white p-4 shadow-2xl animate-scale-in sm:my-8 sm:max-h-none sm:overflow-visible sm:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -240,10 +240,10 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
               </p>
             </div>
           ) : (
-            <div className="rounded-3xl border border-[#e4dcd3] bg-[#fafaf7] p-4 flex flex-col sm:flex-row gap-5 items-center">
+            <div className="flex flex-col items-center gap-4 rounded-3xl border border-[#e4dcd3] bg-[#fafaf7] p-3 sm:flex-row sm:gap-5 sm:p-4">
               {/* Preserved Natural Ratio Thumbnail */}
               <div
-                className="relative rounded-2xl overflow-hidden bg-[#e6e0d6] shadow-sm max-w-[200px] w-full"
+                className="relative w-full max-w-[200px] overflow-hidden rounded-2xl bg-[#e6e0d6] shadow-sm"
                 style={{ aspectRatio: `${dimensions?.aspectRatio || 1}` }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -256,8 +256,8 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
 
               {/* Metadata Badges */}
               <div className="flex-1 space-y-2 text-left">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#1f2925]">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="min-w-0 break-all text-xs font-bold uppercase tracking-wider text-[#1f2925]">
                     {file?.name}
                   </span>
                   <button
@@ -345,8 +345,8 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
 
           {/* Error / Retry Box */}
           {error && (
-            <div className="rounded-2xl border border-[#e8b9ad] bg-[#fff5f2] p-4 text-xs font-medium text-[#a84f37] flex items-center justify-between gap-3 animate-fade-in">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col items-stretch gap-3 rounded-2xl border border-[#e8b9ad] bg-[#fff5f2] p-4 text-xs font-medium text-[#a84f37] animate-fade-in sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-2">
                 <span>⚠️</span>
                 <span>{error}</span>
               </div>

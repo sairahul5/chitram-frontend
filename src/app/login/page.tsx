@@ -15,11 +15,8 @@ export default function LoginPage() {
 
             {/* Navigation Header */}
             <header className="relative z-10 mx-auto w-full max-w-6xl px-6 py-8 flex items-center justify-between">
-                <Link
-                    href="/"
-                    className="text-2xl font-bold tracking-tight text-[#1f2925] hover:opacity-80 transition"
-                >
-                    Chitram
+                <Link href="/" className="shrink-0 hover:opacity-80 transition" aria-label="Chitram home">
+                    <img src="/name.png" alt="Chitram" className="h-11 w-40 translate-y-2 object-cover object-center" />
                 </Link>
                 <Link
                     href="/"

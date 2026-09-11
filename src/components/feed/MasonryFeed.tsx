@@ -13,6 +13,8 @@ interface MasonryFeedProps {
   currentUserId?: number | null;
   isAdmin?: boolean;
   onDeletePin?: (id: number) => void;
+  onEditPin?: (item: VisualItem) => Promise<VisualItem>;
+  isOwnerFeed?: boolean;
   savedPinIds?: number[];
   onSaveToggle?: (id: number, shouldSave: boolean) => Promise<void>;
   emptyTitle?: string;
@@ -30,6 +32,8 @@ export function MasonryFeed({
   currentUserId,
   isAdmin,
   onDeletePin,
+  onEditPin,
+  isOwnerFeed = false,
   savedPinIds = [],
   onSaveToggle,
   emptyTitle = "No posts discovered yet",
@@ -59,7 +63,7 @@ export function MasonryFeed({
 
   if (isLoading && items.length === 0) {
     return (
-      <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4">
+      <div className="columns-2 gap-2.5 space-y-2.5 sm:columns-3 sm:gap-4 sm:space-y-4 lg:columns-4 xl:columns-5">
         {SKELETON_RATIOS.map((ratio, index) => (
           <div
             key={index}
@@ -100,7 +104,7 @@ export function MasonryFeed({
         - Large Tablet / Laptop (lg): 4 columns
         - Desktop (xl): 5 columns
       */}
-      <div className="columns-2 sm:columns-3 lg:columns-4 xl:columns-5 gap-4 space-y-4 animate-fade-in">
+      <div className="columns-2 gap-2.5 space-y-2.5 animate-fade-in sm:columns-3 sm:gap-4 sm:space-y-4 lg:columns-4 xl:columns-5">
         {items.map((item) => (
           <PinCard
             key={item.id}
@@ -108,6 +112,8 @@ export function MasonryFeed({
             currentUserId={currentUserId}
             isAdmin={isAdmin}
             onDelete={onDeletePin}
+            onEdit={onEditPin}
+            isOwnerFeed={isOwnerFeed}
             initiallySaved={savedPinIds.includes(item.id)}
             onSaveToggle={onSaveToggle}
           />

@@ -264,13 +264,24 @@ export default function ProfilePage() {
         }
     };
 
+    const handleEditPin = async (updated: VisualItem) => {
+        const saved = await apiClient<VisualItem>(`/visual-items/${updated.id}`, {
+            method: "PUT",
+            body: JSON.stringify({ title: updated.title, category: updated.category, description: updated.description }),
+        });
+        setProfile((prev) => prev ? { ...prev, creations: prev.creations.map((item) => item.id === saved.id ? saved : item) } : prev);
+        setAllCreations((prev) => prev.map((item) => item.id === saved.id ? saved : item));
+        setSavedPins((prev) => prev.map((item) => item.id === saved.id ? saved : item));
+        return saved;
+    };
+
     if (loading) {
         return (
             <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">
                 <header className="sticky top-0 z-20 border-b border-[#e4dcd3] bg-[#f5f1e9]/90 backdrop-blur-md">
-                    <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
+                    <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-10">
                         <div className="flex items-center gap-6">
-                            <span className="text-xl font-bold tracking-tight text-[#1f2925]">Chitram</span>
+                            <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
                             <div className="h-5 w-24 rounded-full animate-shimmer" />
                         </div>
                         <div className="flex items-center gap-3">
@@ -350,33 +361,33 @@ export default function ProfilePage() {
         <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">
             {/* Top Navigation Bar */}
             <header className="sticky top-0 z-20 border-b border-[#e4dcd3] bg-[#f5f1e9]/90 backdrop-blur-md">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
-                    <div className="flex items-center gap-6">
-                        <Link href="/" className="text-xl font-bold tracking-tight text-[#1f2925]">
-                            Chitram
+                <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:flex-nowrap sm:px-6 sm:py-4 lg:px-10">
+                    <div className="flex min-w-0 items-center gap-3 sm:gap-6">
+                        <Link href="/" className="shrink-0" aria-label="Chitram home">
+                            <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
                         </Link>
                         <span className="hidden rounded-full bg-[#fbebe4] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#d2643b] sm:inline-block">
                             Creator Profile
                         </span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="order-3 flex w-full items-center gap-2 sm:order-2 sm:w-auto sm:gap-3">
                         {profile.isAdmin && (
                             <Link
                                 href="/admin"
-                                className="rounded-full bg-[#1f2925] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2e3b36] transition shadow-sm"
+                                className="flex-1 rounded-full bg-[#1f2925] px-3 py-2 text-center text-xs font-semibold text-white hover:bg-[#2e3b36] transition shadow-sm sm:flex-none sm:px-4 sm:text-sm"
                             >
                                 Admin Panel
                             </Link>
                         )}
                         <Link
                             href="/"
-                            className="rounded-full border border-[#d8ded8] px-4 py-2 text-sm font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition"
+                            className="flex-1 rounded-full border border-[#d8ded8] px-3 py-2 text-center text-xs font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition sm:flex-none sm:px-4 sm:text-sm"
                         >
                             Gallery
                         </Link>
                         <button
                             onClick={handleSignOut}
-                            className="rounded-full border border-[#d8ded8] px-4 py-2 text-sm font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition"
+                            className="flex-1 rounded-full border border-[#d8ded8] px-3 py-2 text-center text-xs font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition sm:flex-none sm:px-4 sm:text-sm"
                             type="button"
                         >
                             Sign out
@@ -385,13 +396,13 @@ export default function ProfilePage() {
                 </div>
             </header>
 
-            <div className="mx-auto max-w-7xl px-6 py-8 lg:px-10 lg:py-12 animate-fade-in">
+            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-12 animate-fade-in">
                 {/* Profile Hero Card */}
-                <section className="relative overflow-hidden rounded-3xl border border-[#e4dcd3] bg-white p-6 sm:p-8 shadow-[0_16px_50px_rgba(31,41,37,0.06)]">
+                <section className="relative overflow-hidden rounded-3xl border border-[#e4dcd3] bg-white p-4 sm:p-8 shadow-[0_16px_50px_rgba(31,41,37,0.06)]">
                     {/* Top row: Avatar + Info on left, Buttons on right */}
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                         {/* Avatar & User Info */}
-                        <div className="flex items-start gap-4 sm:gap-5">
+                        <div className="flex min-w-0 items-start gap-3 sm:gap-5">
                             <div className="shrink-0">
                                 <Avatar
                                     src={profile.pictureUrl}
@@ -437,7 +448,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Action buttons — stacked on mobile, row on sm+ */}
-                        <div className="flex shrink-0 items-center gap-2 sm:mt-1">
+                        <div className="flex w-full shrink-0 items-center justify-end gap-2 sm:mt-1 sm:w-auto">
                             <button
                                 onClick={openEditProfile}
                                 className="inline-flex items-center gap-1.5 rounded-full border border-[#d8ded8] bg-white px-3.5 py-2 text-sm font-semibold text-[#1f2925] hover:bg-[#fafaf7] hover:border-[#1f2925] active:scale-95 transition shadow-sm"
@@ -723,6 +734,8 @@ export default function ProfilePage() {
                                 currentUserId={profile.id}
                                 isAdmin={profile.isAdmin}
                                 onDeletePin={handleDeletePin}
+                                onEditPin={handleEditPin}
+                                isOwnerFeed
                                 savedPinIds={savedPins.map((pin) => pin.id)}
                                 onSaveToggle={handleSaveToggle}
                                 emptyTitle="No creations published yet"
@@ -739,6 +752,7 @@ export default function ProfilePage() {
                                 isLoading={tabLoading}
                                 currentUserId={profile.id}
                                 isAdmin={profile.isAdmin}
+                                onEditPin={handleEditPin}
                                 savedPinIds={savedPins.map((pin) => pin.id)}
                                 onSaveToggle={handleSaveToggle}
                                 emptyTitle="No saved pins yet"
@@ -756,6 +770,7 @@ export default function ProfilePage() {
                                 currentUserId={profile.id}
                                 isAdmin={profile.isAdmin}
                                 onDeletePin={handleDeletePin}
+                                onEditPin={handleEditPin}
                                 savedPinIds={savedPins.map((pin) => pin.id)}
                                 onSaveToggle={handleSaveToggle}
                                 emptyTitle="No community creations yet"

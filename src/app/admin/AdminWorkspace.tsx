@@ -115,6 +115,15 @@ export default function AdminWorkspace() {
         }
     };
 
+    const handleEditPin = async (updated: VisualItem) => {
+        const saved = await apiClient<VisualItem>(`/visual-items/${updated.id}`, {
+            method: "PUT",
+            body: JSON.stringify({ title: updated.title, category: updated.category, description: updated.description }),
+        });
+        setImages((prev) => prev.map((item) => item.id === saved.id ? saved : item));
+        return saved;
+    };
+
     const handleSaveToggle = async (id: number, shouldSave: boolean) => {
         await apiClient(`/user/saved/${id}`, { method: shouldSave ? "POST" : "DELETE" });
         setSavedPinIds((prev) =>
@@ -125,15 +134,15 @@ export default function AdminWorkspace() {
     return (
         <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">
             <header className="sticky top-0 z-10 border-b border-[#d8ded8] bg-[#f5f1e9]/95 backdrop-blur">
-                <div className="mx-auto flex max-w-7xl items-center gap-6 px-6 py-4 lg:px-10">
-                    <Link className="shrink-0 text-lg font-semibold tracking-tight" href="/">
-                        Chitram
+                <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4 lg:px-10">
+                    <Link className="shrink-0" href="/" aria-label="Chitram home">
+                        <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
                     </Link>
-                    <nav className="flex flex-1 items-center gap-1" aria-label="Admin navigation">
-                        <button className={`rounded-full px-4 py-2 text-sm font-semibold transition ${view === "home" ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:bg-white"}`} onClick={() => setView("home")} type="button">
+                    <nav className="flex min-w-0 flex-1 items-center gap-1" aria-label="Admin navigation">
+                        <button className={`rounded-full px-2.5 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm ${view === "home" ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:bg-white"}`} onClick={() => setView("home")} type="button">
                             Home
                         </button>
-                        <button className={`rounded-full px-4 py-2 text-sm font-semibold transition ${view === "panel" ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:bg-white"}`} onClick={() => setView("panel")} type="button">
+                        <button className={`rounded-full px-2.5 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm ${view === "panel" ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:bg-white"}`} onClick={() => setView("panel")} type="button">
                             Panel
                         </button>
                     </nav>
@@ -143,7 +152,7 @@ export default function AdminWorkspace() {
 
                     <span className="hidden rounded-full bg-[#e9eee8] px-3 py-2 text-xs font-semibold text-[#68736d] sm:inline-flex">Admin workspace</span>
                     <button
-                        className="rounded-full border border-[#d8ded8] px-3 py-1.5 text-xs font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition active:scale-95"
+                        className="rounded-full border border-[#d8ded8] px-2 py-1.5 text-[11px] font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition active:scale-95 sm:px-3 sm:text-xs"
                         onClick={async () => {
                             try {
                                 await apiClient<void>("/auth/logout", { method: "POST" });
@@ -159,7 +168,7 @@ export default function AdminWorkspace() {
                 </div>
             </header>
 
-            <div className="mx-auto max-w-7xl px-6 py-10 lg:px-10 lg:py-14 animate-fade-in">
+            <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10 lg:px-10 lg:py-14 animate-fade-in">
                 {dashboardError || view === "panel" ? (
                     <PanelView
                         dashboard={dashboard}
@@ -174,7 +183,7 @@ export default function AdminWorkspace() {
                         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
                             <div>
                                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#d2643b]">Admin home</p>
-                                <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">See what Chitram is becoming.</h1>
+                                <h1 className="mt-3 text-[2.35rem] leading-[1.08] font-semibold tracking-tight sm:text-5xl">See what Chitram is becoming.</h1>
                                 <p className="mt-4 max-w-2xl text-base leading-7 text-[#68736d]">A calm view of the latest visual activity across the platform with natural aspect ratios.</p>
                             </div>
                         </div>
@@ -187,6 +196,7 @@ export default function AdminWorkspace() {
                                 isLoading={loadingImages}
                                 isAdmin={true}
                                 onDeletePin={handleDeletePin}
+                                onEditPin={handleEditPin}
                                 savedPinIds={savedPinIds}
                                 onSaveToggle={handleSaveToggle}
                                 emptyTitle="No visual items yet"
@@ -272,7 +282,7 @@ function PanelView({
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#d2643b]">Platform panel</p>
             <div className="mt-3 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                 <div>
-                    <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Know the shape of Chitram.</h1>
+                    <h1 className="text-[2.35rem] leading-[1.08] font-semibold tracking-tight sm:text-5xl">Know the shape of Chitram.</h1>
                     <p className="mt-4 max-w-2xl text-base leading-7 text-[#68736d]">A read-only overview of users, activity, and database readiness.</p>
                 </div>
                 <span className="text-sm text-[#68736d]">Updated live</span>

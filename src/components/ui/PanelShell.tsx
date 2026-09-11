@@ -25,8 +25,8 @@ export function PanelShell({
             <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col lg:flex-row">
                 <aside className="flex w-full flex-col justify-between border-b border-[#d8ded8] px-6 py-6 lg:w-64 lg:border-b-0 lg:border-r lg:px-8 lg:py-10">
                     <div>
-                        <Link className="text-lg font-semibold tracking-tight" href="/">
-                            Chitram
+                        <Link className="shrink-0" href="/" aria-label="Chitram home">
+                            <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center" />
                         </Link>
                         <p className="mt-1 text-sm text-[#68736d]">{role} workspace</p>
                         <nav className="mt-10 flex gap-2 lg:flex-col" aria-label={`${role} panel navigation`}>
