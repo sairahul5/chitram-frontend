@@ -33,8 +33,8 @@ export function PinCard({
   const ratio = item.aspectRatio
     ? Number(item.aspectRatio)
     : item.width && item.height
-    ? item.width / item.height
-    : 0.75;
+      ? item.width / item.height
+      : 0.75;
 
   const canDelete = Boolean(
     (currentUserId && item.uploadedBy && currentUserId === item.uploadedBy) || isAdmin
@@ -109,9 +109,8 @@ export function PinCard({
             loading="lazy"
             decoding="async"
             onLoad={() => setIsLoaded(true)}
-            className={`w-full h-full object-cover transition-all duration-500 ease-out ${
-              isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
-            }`}
+            className={`w-full h-full object-cover transition-all duration-500 ease-out ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
+              }`}
           />
 
           {/* Hover Overlay */}
@@ -141,11 +140,10 @@ export function PinCard({
               type="button"
               disabled={!currentUserId || isSaving}
               title={!currentUserId ? "Sign in to save this post" : undefined}
-              className={`px-4 py-2 rounded-full text-xs font-bold transition-all shadow-md active:scale-90 ${
-                initiallySaved
-                  ? "bg-[#1f2925] text-white"
-                  : "bg-[#d2643b] text-white hover:bg-[#b85029]"
-              } disabled:opacity-60 disabled:cursor-not-allowed`}
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all shadow-md active:scale-90 ${initiallySaved
+                ? "bg-[#1f2925] text-white"
+                : "bg-[#d2643b] text-white hover:bg-[#b85029]"
+                } disabled:opacity-60 disabled:cursor-not-allowed`}
             >
               {isSaving ? "Saving..." : initiallySaved ? "Saved ✓" : "Save"}
             </button>

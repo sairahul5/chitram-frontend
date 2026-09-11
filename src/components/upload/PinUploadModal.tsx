@@ -217,11 +217,10 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
               }}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`flex flex-col items-center justify-center rounded-3xl border-2 border-dashed p-8 text-center cursor-pointer transition ${
-                isDragging
-                  ? "border-[#d2643b] bg-[#fbebe4]/50"
-                  : "border-[#ccd4cd] bg-[#fafaf7] hover:border-[#1f2925] hover:bg-[#f5f1e9]/60"
-              }`}
+              className={`flex flex-col items-center justify-center rounded-3xl border-2 border-dashed p-8 text-center cursor-pointer transition ${isDragging
+                ? "border-[#d2643b] bg-[#fbebe4]/50"
+                : "border-[#ccd4cd] bg-[#fafaf7] hover:border-[#1f2925] hover:bg-[#f5f1e9]/60"
+                }`}
             >
               <input
                 ref={fileInputRef}

@@ -450,11 +450,10 @@ export default function ProfilePage() {
                             </button>
                             <button
                                 onClick={() => setShowUpload(!showUpload)}
-                                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold shadow-sm active:scale-95 transition duration-200 ${
-                                    showUpload
-                                        ? "bg-[#fbebe4] text-[#d2643b] border border-[#f5c7b3]"
-                                        : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
-                                }`}
+                                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold shadow-sm active:scale-95 transition duration-200 ${showUpload
+                                    ? "bg-[#fbebe4] text-[#d2643b] border border-[#f5c7b3]"
+                                    : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
+                                    }`}
                             >
                                 <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -652,9 +651,8 @@ export default function ProfilePage() {
                 <nav className="mt-8 flex border-b border-[#e4dcd3] gap-1 overflow-x-auto scrollbar-none -mx-1 px-1">
                     <button
                         onClick={() => setActiveTab("creations")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${
-                            activeTab === "creations" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                        }`}
+                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "creations" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
+                            }`}
                     >
                         My Creations ({profile.creationsCount})
                         {activeTab === "creations" && (
@@ -663,9 +661,8 @@ export default function ProfilePage() {
                     </button>
                     <button
                         onClick={() => setActiveTab("saved")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${
-                            activeTab === "saved" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                        }`}
+                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "saved" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
+                            }`}
                     >
                         Saved Pins ({savedPins.length})
                         {activeTab === "saved" && (
@@ -675,9 +672,8 @@ export default function ProfilePage() {
                     {profile.isAdmin && (
                         <button
                             onClick={() => setActiveTab("all-creations")}
-                            className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${
-                                activeTab === "all-creations" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                            }`}
+                            className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "all-creations" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
+                                }`}
                         >
                             All Platform Creations ({allCreations.length})
                             {activeTab === "all-creations" && (
@@ -687,9 +683,8 @@ export default function ProfilePage() {
                     )}
                     <button
                         onClick={() => setActiveTab("creators")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${
-                            activeTab === "creators" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                        }`}
+                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "creators" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
+                            }`}
                     >
                         Discover Creators
                         {activeTab === "creators" && (
@@ -698,9 +693,8 @@ export default function ProfilePage() {
                     </button>
                     <button
                         onClick={() => setActiveTab("followers")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${
-                            activeTab === "followers" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                        }`}
+                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "followers" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
+                            }`}
                     >
                         Followers ({profile.followersCount})
                         {activeTab === "followers" && (
@@ -709,9 +703,8 @@ export default function ProfilePage() {
                     </button>
                     <button
                         onClick={() => setActiveTab("following")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${
-                            activeTab === "following" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                        }`}
+                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "following" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
+                            }`}
                     >
                         Following ({profile.followingCount})
                         {activeTab === "following" && (
@@ -816,11 +809,10 @@ export default function ProfilePage() {
                                         <button
                                             disabled={actionLoadingId === creator.id}
                                             onClick={() => handleFollowToggle(creator.id, creator.following)}
-                                            className={`rounded-full px-4 py-1.5 text-xs font-semibold active:scale-95 transition inline-flex items-center gap-1.5 ${
-                                                creator.following
-                                                    ? "border border-[#d8ded8] text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37]"
-                                                    : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
-                                            } ${actionLoadingId === creator.id ? "opacity-70 cursor-not-allowed" : ""}`}
+                                            className={`rounded-full px-4 py-1.5 text-xs font-semibold active:scale-95 transition inline-flex items-center gap-1.5 ${creator.following
+                                                ? "border border-[#d8ded8] text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37]"
+                                                : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
+                                                } ${actionLoadingId === creator.id ? "opacity-70 cursor-not-allowed" : ""}`}
                                         >
                                             {actionLoadingId === creator.id ? (
                                                 <>
@@ -885,11 +877,10 @@ export default function ProfilePage() {
                                         <button
                                             disabled={actionLoadingId === follower.id}
                                             onClick={() => handleFollowToggle(follower.id, follower.following)}
-                                            className={`rounded-full px-4 py-1.5 text-xs font-semibold active:scale-95 transition inline-flex items-center gap-1.5 ${
-                                                follower.following
-                                                    ? "border border-[#d8ded8] text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37]"
-                                                    : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
-                                            } ${actionLoadingId === follower.id ? "opacity-70 cursor-not-allowed" : ""}`}
+                                            className={`rounded-full px-4 py-1.5 text-xs font-semibold active:scale-95 transition inline-flex items-center gap-1.5 ${follower.following
+                                                ? "border border-[#d8ded8] text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37]"
+                                                : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
+                                                } ${actionLoadingId === follower.id ? "opacity-70 cursor-not-allowed" : ""}`}
                                         >
                                             {actionLoadingId === follower.id ? (
                                                 <>
@@ -960,9 +951,8 @@ export default function ProfilePage() {
                                         <button
                                             disabled={actionLoadingId === user.id}
                                             onClick={() => handleFollowToggle(user.id, true)}
-                                            className={`rounded-full border border-[#d8ded8] px-4 py-1.5 text-xs font-semibold text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37] active:scale-95 transition inline-flex items-center gap-1.5 ${
-                                                actionLoadingId === user.id ? "opacity-70 cursor-not-allowed" : ""
-                                            }`}
+                                            className={`rounded-full border border-[#d8ded8] px-4 py-1.5 text-xs font-semibold text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37] active:scale-95 transition inline-flex items-center gap-1.5 ${actionLoadingId === user.id ? "opacity-70 cursor-not-allowed" : ""
+                                                }`}
                                         >
                                             {actionLoadingId === user.id ? (
                                                 <>

@@ -16,7 +16,7 @@ import {
 type View = "home" | "panel";
 
 type AdminMetric = { label: string; value: number; change: string };
-type AdminTable  = { name: string; rows: number; status: string };
+type AdminTable = { name: string; rows: number; status: string };
 type AdminDashboard = { metrics: AdminMetric[]; tables: AdminTable[] };
 type AdminUser = {
     id: number;
@@ -99,9 +99,9 @@ export default function AdminWorkspace() {
 
     const wsStatus = useAdminWebSocket({
         onDashboardUpdate: handleDashboardUpdate,
-        onUsersUpdate:     handleUsersUpdate,
-        onNewImage:        handleNewImage,
-        onImageDeleted:    handleImageDeleted,
+        onUsersUpdate: handleUsersUpdate,
+        onNewImage: handleNewImage,
+        onImageDeleted: handleImageDeleted,
     });
 
     // ── Admin delete (also handled by WS, but keep optimistic UI) ───────────
@@ -203,8 +203,8 @@ export default function AdminWorkspace() {
 // ── Live indicator dot ───────────────────────────────────────────────────────
 function LiveIndicator({ status }: { status: "connecting" | "connected" | "disconnected" }) {
     const configs = {
-        connected:    { dot: "bg-[#438268] animate-pulse", label: "Live", text: "text-[#438268]" },
-        connecting:   { dot: "bg-[#d2a63b] animate-pulse", label: "Connecting…", text: "text-[#d2a63b]" },
+        connected: { dot: "bg-[#438268] animate-pulse", label: "Live", text: "text-[#438268]" },
+        connecting: { dot: "bg-[#d2a63b] animate-pulse", label: "Connecting…", text: "text-[#d2a63b]" },
         disconnected: { dot: "bg-[#a84f37]", label: "Offline", text: "text-[#a84f37]" },
     };
     const c = configs[status];

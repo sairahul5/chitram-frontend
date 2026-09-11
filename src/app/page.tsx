@@ -233,9 +233,8 @@ export default function Home() {
                 key={mode}
                 type="button"
                 onClick={() => setSearchMode(mode)}
-                className={`rounded-xl px-4 py-2 text-xs font-bold capitalize transition ${
-                  searchMode === mode ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:text-[#1f2925]"
-                }`}
+                className={`rounded-xl px-4 py-2 text-xs font-bold capitalize transition ${searchMode === mode ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:text-[#1f2925]"
+                  }`}
               >
                 {mode}
               </button>
@@ -252,11 +251,10 @@ export default function Home() {
                 setSelectedCategory(cat);
                 setSearchQuery("");
               }}
-              className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition active:scale-95 whitespace-nowrap shadow-sm ${
-                selectedCategory === cat
-                  ? "bg-[#1f2925] text-white"
-                  : "bg-white border border-[#e4dcd3] text-[#68736d] hover:text-[#1f2925] hover:border-[#1f2925]"
-              }`}
+              className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition active:scale-95 whitespace-nowrap shadow-sm ${selectedCategory === cat
+                ? "bg-[#1f2925] text-white"
+                : "bg-white border border-[#e4dcd3] text-[#68736d] hover:text-[#1f2925] hover:border-[#1f2925]"
+                }`}
             >
               {cat}
             </button>
