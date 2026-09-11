@@ -120,6 +120,7 @@ export function useAdminWebSocket(handlers: AdminWebSocketHandlers): ConnectionS
             onDisconnect: () => setStatus("disconnected"),
             onStompError:  () => setStatus("disconnected"),
             onWebSocketError: () => setStatus("disconnected"),
+            onWebSocketClose: () => setStatus("disconnected"),
         });
 
         client.activate();

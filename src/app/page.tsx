@@ -167,6 +167,17 @@ export default function Home() {
           </span>
         </div>
 
+        <div className="mx-6 hidden min-w-0 max-w-xl flex-1 lg:block">
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search posts or accounts"
+            className="w-full rounded-2xl border border-[#d8ded8] bg-white px-4 py-2.5 text-sm text-[#1f2925] shadow-sm outline-none transition placeholder:text-[#98a39c] focus:border-[#d2643b]"
+            aria-label="Search posts or accounts"
+          />
+        </div>
+
         <div className="shrink-0 flex items-center gap-2 sm:gap-3">
           {loadingUser ? (
             <div className="h-9 w-24 rounded-full bg-[#e5ded4] animate-pulse" />
@@ -212,7 +223,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl py-5 sm:py-8 animate-fade-in">
-        <div className="flex max-w-2xl flex-col gap-2.5 sm:flex-row">
+        <div className="flex max-w-2xl flex-col gap-2.5 sm:flex-row lg:hidden">
           <div className="relative flex-1">
             <input
               type="search"
