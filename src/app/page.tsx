@@ -43,6 +43,7 @@ export default function Home() {
 
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [savedPinIds, setSavedPinIds] = useState<number[]>([]);
+  const [recommendationsEnabled, setRecommendationsEnabled] = useState(true);
 
   // Initial feed load
   const loadFeed = useCallback(async (query: string = "", personalized = false) => {
@@ -95,6 +96,12 @@ export default function Home() {
   };
 
   useEffect(() => {
+    apiClient<{ enabled: boolean }>("/recommendations/status")
+      .then((status) => setRecommendationsEnabled(status.enabled))
+      .catch(() => setRecommendationsEnabled(true));
+  }, []);
+
+  useEffect(() => {
     const accountQuery = searchQuery.trim().replace(/^@/, "");
     if (accountQuery) {
       apiClient<AccountSearchResult[]>(`/user/search?query=${encodeURIComponent(accountQuery)}`)
@@ -104,12 +111,12 @@ export default function Home() {
     const feedLoad = window.setTimeout(() => {
       void loadFeed(
         selectedCategory === "All" ? searchQuery : selectedCategory,
-        Boolean(currentUser && selectedCategory === "All" && !searchQuery.trim())
+        Boolean(recommendationsEnabled && currentUser && selectedCategory === "All" && !searchQuery.trim())
       );
     }, 0);
 
     return () => window.clearTimeout(feedLoad);
-  }, [selectedCategory, searchQuery, currentUser, loadFeed]);
+  }, [selectedCategory, searchQuery, currentUser, recommendationsEnabled, loadFeed]);
 
   useEffect(() => {
     apiClient<{ id: number; name: string; email: string; pictureUrl?: string | null; username?: string | null; isAdmin?: boolean } | null>("/auth/session")

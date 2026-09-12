@@ -46,10 +46,18 @@ export default function AdminWorkspace() {
     const [savedPinIds, setSavedPinIds] = useState<number[]>([]);
     const [requiresLogin, setRequiresLogin] = useState(false);
     const [liveUsers, setLiveUsers] = useState<AdminUser[] | null>(null);
+    const [recommendationsEnabled, setRecommendationsEnabled] = useState(true);
+    const [savingRecommendationSetting, setSavingRecommendationSetting] = useState(false);
     const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-og9p.onrender.com/api").replace(/\/api\/?$/, "");
 
     // ── Initial REST loads ───────────────────────────────────────────────────
     useEffect(() => {
+        apiClient<{ enabled: boolean }>("/admin/settings/recommendations")
+            .then((settings) => setRecommendationsEnabled(settings.enabled))
+            .catch(() => undefined);
+        }, []);
+
+        useEffect(() => {
         apiClient<AdminDashboard>("/admin/dashboard", { credentials: "include" })
             .then(setDashboard)
             .catch((error: unknown) => {
@@ -177,6 +185,20 @@ export default function AdminWorkspace() {
                         requiresLogin={requiresLogin}
                         loading={loadingDashboard}
                         liveUsers={liveUsers}
+                        recommendationsEnabled={recommendationsEnabled}
+                        savingRecommendationSetting={savingRecommendationSetting}
+                        onRecommendationsEnabledChange={async (enabled) => {
+                            setSavingRecommendationSetting(true);
+                            try {
+                                const settings = await apiClient<{ enabled: boolean }>("/admin/settings/recommendations", {
+                                    method: "PUT",
+                                    body: JSON.stringify({ enabled }),
+                                });
+                                setRecommendationsEnabled(settings.enabled);
+                            } finally {
+                                setSavingRecommendationSetting(false);
+                            }
+                        }}
                     />
                 ) : (
                     <>
@@ -235,6 +257,9 @@ function PanelView({
     requiresLogin,
     loading,
     liveUsers,
+    recommendationsEnabled,
+    savingRecommendationSetting,
+    onRecommendationsEnabledChange,
 }: {
     dashboard: AdminDashboard | null;
     error: string | null;
@@ -242,6 +267,9 @@ function PanelView({
     requiresLogin: boolean;
     loading: boolean;
     liveUsers: Array<{ id: number; email: string; displayName: string; pictureUrl?: string | null; role: string; createdAt: string }> | null;
+    recommendationsEnabled: boolean;
+    savingRecommendationSetting: boolean;
+    onRecommendationsEnabledChange: (enabled: boolean) => Promise<void>;
 }) {
     if (error) {
         return (
@@ -295,6 +323,20 @@ function PanelView({
                     </section>
                 ))}
             </div>
+            <section className="mt-6 flex flex-col justify-between gap-4 rounded-3xl border border-[#d8ded8] bg-white p-6 sm:flex-row sm:items-center">
+                <div>
+                    <h2 className="font-semibold">Personalized recommendations</h2>
+                    <p className="mt-1 text-sm text-[#68736d]">When disabled, the home page uses the normal chronological feed.</p>
+                </div>
+                <button
+                    type="button"
+                    disabled={savingRecommendationSetting}
+                    onClick={() => void onRecommendationsEnabledChange(!recommendationsEnabled)}
+                    className={`rounded-full px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-wait disabled:opacity-60 ${recommendationsEnabled ? "bg-[#438268]" : "bg-[#68736d]"}`}
+                >
+                    {savingRecommendationSetting ? "Saving..." : recommendationsEnabled ? "Enabled" : "Disabled"}
+                </button>
+            </section>
             <section className="mt-6 overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                 <div className="flex items-center justify-between border-b border-[#e8ece8] px-6 py-5">
                     <div>
