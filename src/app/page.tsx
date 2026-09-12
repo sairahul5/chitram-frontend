@@ -7,7 +7,8 @@ import { PinUploadModal } from "@/components/upload/PinUploadModal";
 import { VisualItem, VisualFeedResponse } from "@/types/visualItem";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 const CATEGORIES = ["All", "Photography", "Travel", "Architecture", "Nature", "Art & Design", "Culture"];
 
@@ -20,6 +21,9 @@ type AccountSearchResult = {
 };
 
 export default function Home() {
+  const router = useRouter();
+  const desktopSearchRef = useRef<HTMLInputElement>(null);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
   const [items, setItems] = useState<VisualItem[]>([]);
   const [loadingItems, setLoadingItems] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -147,6 +151,24 @@ export default function Home() {
       .catch(() => setSavedPinIds([]));
   }, [currentUser]);
 
+  useEffect(() => {
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+    const focusVisibleSearch = () => {
+      const searchInputs = [desktopSearchRef.current, mobileSearchRef.current];
+      const visibleInput = searchInputs.find((input) => input && input.offsetParent !== null);
+      visibleInput?.focus();
+    };
+    const handleGlobalSearchShortcut = (event: KeyboardEvent) => {
+      const modifierPressed = isMac ? event.metaKey : event.ctrlKey;
+      if (modifierPressed && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        focusVisibleSearch();
+      }
+    };
+    window.addEventListener("keydown", handleGlobalSearchShortcut);
+    return () => window.removeEventListener("keydown", handleGlobalSearchShortcut);
+  }, []);
+
   const handleSaveToggle = async (id: number, shouldSave: boolean) => {
     await apiClient(`/user/saved/${id}`, { method: shouldSave ? "POST" : "DELETE" });
     setSavedPinIds((prev) =>
@@ -176,6 +198,17 @@ export default function Home() {
     setSearchQuery(value);
     if (!value.trim().replace(/^@/, "")) {
       setAccountResults([]);
+    }
+  };
+
+  const handleSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Escape") {
+      event.currentTarget.blur();
+      return;
+    }
+    if (event.key === "Enter" && accountResults[0]) {
+      event.preventDefault();
+      router.push(`/account/${accountResults[0].username || accountResults[0].id}`);
     }
   };
 
@@ -229,12 +262,15 @@ export default function Home() {
 
         <div className="mx-6 hidden min-w-0 max-w-xl flex-1 lg:block">
           <input
+            ref={desktopSearchRef}
             type="search"
             value={searchQuery}
             onChange={(event) => handleSearchChange(event.target.value)}
+            onKeyDown={handleSearchKeyDown}
             placeholder="Search posts or accounts"
             className="w-full rounded-2xl border border-[#d8ded8] bg-white px-4 py-2.5 text-sm text-[#1f2925] shadow-sm outline-none transition placeholder:text-[#98a39c] focus:border-[#d2643b]"
             aria-label="Search posts or accounts"
+            aria-keyshortcuts="Control+K Meta+K Escape Enter"
           />
         </div>
 
@@ -286,12 +322,15 @@ export default function Home() {
         <div className="flex max-w-2xl flex-col gap-2.5 sm:flex-row lg:hidden">
           <div className="relative flex-1">
             <input
+              ref={mobileSearchRef}
               type="search"
               value={searchQuery}
               onChange={(event) => handleSearchChange(event.target.value)}
+              onKeyDown={handleSearchKeyDown}
               placeholder="Search posts or accounts"
               className="w-full rounded-2xl border border-[#d8ded8] bg-white px-4 py-3 text-sm text-[#1f2925] shadow-sm outline-none transition placeholder:text-[#98a39c] focus:border-[#d2643b]"
               aria-label="Search posts or accounts"
+              aria-keyshortcuts="Control+K Meta+K Escape Enter"
             />
           </div>
         </div>
