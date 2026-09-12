@@ -63,9 +63,9 @@ export default function AdminWorkspace() {
         apiClient<{ enabled: boolean }>("/admin/settings/recommendations")
             .then((settings) => setRecommendationsEnabled(settings.enabled))
             .catch(() => undefined);
-        }, []);
+    }, []);
 
-        useEffect(() => {
+    useEffect(() => {
         apiClient<AdminDashboard>("/admin/dashboard", { credentials: "include" })
             .then(setDashboard)
             .catch((error: unknown) => {
@@ -359,7 +359,7 @@ function PanelView({
                 <div className="flex items-center justify-between border-b border-[#e8ece8] px-6 py-5">
                     <div>
                         <h2 className="font-semibold">Database tables</h2>
-                        <p className="mt-1 text-sm text-[#68736d]">Current foundation and planned domains.</p>
+                        <p className="mt-1 text-sm text-[#68736d]">Tables currently present in the Chitram database.</p>
                     </div>
                     <span className="rounded-full bg-[#e9eee8] px-3 py-1 text-xs font-semibold text-[#438268]">Read only</span>
                 </div>
