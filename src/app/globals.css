@@ -191,6 +191,141 @@
   }
 }
 
+.like-btn {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.25rem;
+  cursor: pointer;
+  color: #68736d;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.like-btn:hover {
+  color: #d7000f;
+}
+
+.like-btn:active {
+  transform: scale(0.95);
+}
+
+.like-btn input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.like-btn input:focus-visible~.like-icon-regular,
+.like-btn input:focus-visible~.like-icon-solid {
+  outline: 2px solid #d2643b;
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+.like-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 10px;
+  transition: 0.2s ease all;
+}
+
+.like-icon-regular {
+  display: block;
+}
+
+.like-icon-solid {
+  display: none;
+}
+
+.like-btn input:checked~.like-icon-regular {
+  display: none;
+  animation: checked-icon-like 0.5s;
+}
+
+.like-btn input:checked~.like-icon-solid {
+  display: block;
+  color: #d7000f;
+  animation: checked-icon-like 0.5s;
+}
+.like-btn-liked {
+  color: #d7000f;
+}
+.like-btn-liked .like-icon-regular {
+  animation: checked-icon-like 0.5s;
+}
+
+.like-btn-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.like-count {
+  min-width: 1ch;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.like-fireworks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: scale(0.4);
+}
+
+.like-btn input:checked~.like-fireworks>span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 24px -22px #ff006a, 38px 4px #ff8000, -28px -18px #0051ff, -20px 24px #00b7ff, 28px 26px #00ff40, -38px 6px #a600ff;
+  animation: fireworks-bang 0.8s ease-out forwards, fireworks-gravity 0.8s ease-in forwards;
+}
+.like-btn-liked .like-fireworks > span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 24px -22px #ff006a, 38px 4px #ff8000, -28px -18px #0051ff, -20px 24px #00b7ff, 28px 26px #00ff40, -38px 6px #a600ff;
+  animation: fireworks-bang 0.8s ease-out forwards, fireworks-gravity 0.8s ease-in forwards;
+
+@keyframes checked-icon-like {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.2) rotate(-10deg);
+  }
+}
+
+@keyframes fireworks-bang {
+  to {
+    box-shadow: 24px -22px #ff006a, 38px 4px #ff8000, -28px -18px #0051ff, -20px 24px #00b7ff, 28px 26px #00ff40, -38px 6px #a600ff;
+  }
+}
+
+@keyframes fireworks-gravity {
+  to {
+    transform: translateY(32px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .like-icon,
+  .like-btn input:checked~.like-fireworks>span {
+    animation: none;
+  }
+}
+
 /* Smooth fade in animation */
 @keyframes fadeIn {
   from {
