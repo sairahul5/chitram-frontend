@@ -4,6 +4,7 @@ import Link from "next/link";
 import { apiClient } from "@/lib/apiClient";
 import { useCallback, useEffect, useState } from "react";
 import AdminUsers from "./AdminUsers";
+import AdminOperations from "./AdminOperations";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { VisualItem } from "@/types/visualItem";
 import {
@@ -11,13 +12,14 @@ import {
     WsAdminDashboard,
     WsAdminUser,
     WsVisualItem,
+    AdminActivity,
 } from "@/hooks/useAdminWebSocket";
 
 type View = "home" | "panel";
 
 type AdminMetric = { label: string; value: number; change: string };
 type AdminTable = { name: string; rows: number; status: string };
-type AdminDashboard = { metrics: AdminMetric[]; tables: AdminTable[] };
+type AdminDashboard = { metrics: AdminMetric[]; tables: AdminTable[]; recentActivity: AdminActivity[] };
 type AdminUser = {
     id: number;
     email: string;
@@ -25,6 +27,11 @@ type AdminUser = {
     pictureUrl?: string | null;
     role: string;
     createdAt: string;
+    accountStatus?: string;
+    pins?: number;
+    likes?: number;
+    followers?: number;
+    following?: number;
 };
 
 // Merge a WsAdminDashboard (no `change` field) into AdminDashboard safely
@@ -32,6 +39,7 @@ function mergeDashboard(incoming: WsAdminDashboard): AdminDashboard {
     return {
         metrics: incoming.metrics.map((m) => ({ label: m.label, value: m.value, change: "" })),
         tables: incoming.tables,
+        recentActivity: incoming.recentActivity ?? [],
     };
 }
 
@@ -266,7 +274,7 @@ function PanelView({
     loginUrl: string;
     requiresLogin: boolean;
     loading: boolean;
-    liveUsers: Array<{ id: number; email: string; displayName: string; pictureUrl?: string | null; role: string; createdAt: string }> | null;
+    liveUsers: Array<{ id: number; email: string; displayName: string; pictureUrl?: string | null; role: string; createdAt: string; accountStatus?: string; pins?: number; likes?: number; followers?: number; following?: number }> | null;
     recommendationsEnabled: boolean;
     savingRecommendationSetting: boolean;
     onRecommendationsEnabledChange: (enabled: boolean) => Promise<void>;
@@ -352,7 +360,24 @@ function PanelView({
                     </table>
                 </div>
             </section>
+            <section className="mt-6 overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
+                <div className="border-b border-[#e8ece8] px-6 py-5">
+                    <h2 className="font-semibold">Recent activity</h2>
+                    <p className="mt-1 text-sm text-[#68736d]">The latest platform events.</p>
+                </div>
+                <div className="divide-y divide-[#e8ece8]">
+                    {dashboard.recentActivity.length === 0 ? (
+                        <p className="px-6 py-6 text-sm text-[#68736d]">No activity recorded yet.</p>
+                    ) : dashboard.recentActivity.map((activity) => (
+                        <div className="flex flex-col gap-1 px-6 py-4 sm:flex-row sm:items-center sm:justify-between" key={`${activity.action}-${activity.occurredAt}`}>
+                            <div><p className="text-sm font-semibold">{activity.action}</p><p className="text-sm text-[#68736d]">{activity.target}</p></div>
+                            <time className="text-xs text-[#98a39c]">{activity.occurredAt}</time>
+                        </div>
+                    ))}
+                </div>
+            </section>
             <AdminUsers liveUsers={liveUsers} />
+            <AdminOperations />
         </div>
     );
 }

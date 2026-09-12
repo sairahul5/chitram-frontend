@@ -11,6 +11,11 @@ type AdminUser = {
     pictureUrl?: string | null;
     role: string;
     createdAt: string;
+    accountStatus?: string;
+    pins?: number;
+    likes?: number;
+    followers?: number;
+    following?: number;
 };
 
 interface AdminUsersProps {
@@ -23,15 +28,22 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
     const [loadingUsers, setLoadingUsers] = useState(true);
     const [updatingUserId, setUpdatingUserId] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [search, setSearch] = useState("");
+    const [processingUserId, setProcessingUserId] = useState<number | null>(null);
 
-    const loadUsers = () => {
-        apiClient<AdminUser[]>("/admin/users")
+    const loadUsers = (query = search) => {
+        apiClient<AdminUser[]>(`/admin/users?search=${encodeURIComponent(query)}`)
             .then(setUsers)
             .catch(() => setError("Unable to load users."))
             .finally(() => setLoadingUsers(false));
     };
 
     useEffect(loadUsers, []);
+
+    useEffect(() => {
+        const timer = window.setTimeout(() => void loadUsers(), 250);
+        return () => window.clearTimeout(timer);
+    }, [search]);
 
     // When the parent receives a fresh user list from the WebSocket, apply it
     useEffect(() => {
@@ -57,6 +69,34 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
         }
     }
 
+    async function changeStatus(user: AdminUser) {
+        setProcessingUserId(user.id);
+        try {
+            await apiClient(`/admin/users/${user.id}/status`, {
+                method: "PUT",
+                body: JSON.stringify({ status: user.accountStatus === "SUSPENDED" ? "ACTIVE" : "SUSPENDED" }),
+            });
+            await loadUsers();
+        } catch {
+            setError("Unable to update this account status.");
+        } finally {
+            setProcessingUserId(null);
+        }
+    }
+
+    async function deleteUser(user: AdminUser) {
+        if (!window.confirm(`Delete ${user.displayName}'s account? This cannot be undone.`)) return;
+        setProcessingUserId(user.id);
+        try {
+            await apiClient(`/admin/users/${user.id}`, { method: "DELETE" });
+            setUsers((previous) => previous.filter((item) => item.id !== user.id));
+        } catch {
+            setError("Unable to delete this account.");
+        } finally {
+            setProcessingUserId(null);
+        }
+    }
+
     return (
         <section className="mt-6 overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
             <div className="flex flex-col items-start gap-3 border-b border-[#e8ece8] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
@@ -64,6 +104,7 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
                     <h2 className="font-semibold">User access</h2>
                     <p className="mt-1 text-sm text-[#68736d]">Manage roles for accounts that have signed in with Google.</p>
                 </div>
+                <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search users" className="rounded-full border border-[#d8ded8] bg-white px-4 py-2 text-sm outline-none focus:border-[#438268]" />
                 {liveUsers !== null && liveUsers !== undefined && (
                     <span className="flex items-center gap-1.5 text-xs text-[#438268] font-medium">
                         <span className="h-1.5 w-1.5 rounded-full bg-[#438268] animate-pulse" />
@@ -78,6 +119,7 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
                         <tr>
                             <th className="px-6 py-4 font-semibold">User</th>
                             <th className="px-6 py-4 font-semibold">Role</th>
+                            <th className="px-6 py-4 font-semibold">Activity</th>
                             <th className="px-6 py-4 font-semibold">Action</th>
                         </tr>
                     </thead>
@@ -99,7 +141,7 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
                             ))
                         ) : users.length === 0 ? (
                             <tr>
-                                <td colSpan={3} className="px-6 py-8 text-center text-[#68736d]">
+                                <td colSpan={4} className="px-6 py-8 text-center text-[#68736d]">
                                     No accounts registered yet.
                                 </td>
                             </tr>
@@ -115,7 +157,8 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-[#68736d]">{user.role}</td>
+                                    <td className="px-6 py-4 text-[#68736d]">{user.role}<br /><span className={user.accountStatus === "SUSPENDED" ? "text-[#a84f37]" : "text-[#438268]"}>{user.accountStatus ?? "ACTIVE"}</span></td>
+                                    <td className="px-6 py-4 text-xs text-[#68736d]">{user.pins ?? 0} pins · {user.likes ?? 0} likes<br />{user.followers ?? 0} followers · {user.following ?? 0} following</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
                                             <select
@@ -130,6 +173,8 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
                                             {updatingUserId === user.id && (
                                                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d2643b] border-t-transparent" />
                                             )}
+                                            <button type="button" disabled={processingUserId === user.id} onClick={() => void changeStatus(user)} className="rounded-lg border border-[#d8ded8] px-3 py-2 text-xs font-semibold">{user.accountStatus === "SUSPENDED" ? "Unsuspend" : "Suspend"}</button>
+                                            <button type="button" disabled={processingUserId === user.id} onClick={() => void deleteUser(user)} className="rounded-lg border border-[#e8b9ad] px-3 py-2 text-xs font-semibold text-[#a84f37]">Delete</button>
                                         </div>
                                     </td>
                                 </tr>

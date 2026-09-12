@@ -9,7 +9,8 @@ import SockJS from "sockjs-client";
 // ──────────────────────────────────────────────────────────────────────────────
 export type WsAdminMetric = { label: string; value: number };
 export type WsAdminTable = { name: string; rows: number; status: string };
-export type WsAdminDashboard = { metrics: WsAdminMetric[]; tables: WsAdminTable[] };
+export type WsAdminDashboard = { metrics: WsAdminMetric[]; tables: WsAdminTable[]; recentActivity?: AdminActivity[] };
+export type AdminActivity = { action: string; target: string; occurredAt: string };
 
 export type WsAdminUser = {
     id: number;
