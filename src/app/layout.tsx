@@ -13,12 +13,12 @@ export const metadata: Metadata = {
   description: "India's visual discovery platform.",
   icons: {
     icon: {
-      url: "/icon.png",
+      url: "/icon.png?v=2",
       type: "image/png",
       sizes: "6250x6250",
     },
-    shortcut: "/icon.png",
-    apple: "/icon.png",
+    shortcut: "/icon.png?v=2",
+    apple: "/icon.png?v=2",
   },
 };
 
