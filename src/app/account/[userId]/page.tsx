@@ -37,7 +37,7 @@ export default function PublicAccountPage() {
         const userId = params.userId;
         if (!userId) return;
 
-        apiClient<PublicProfile>(`/user/profile/${userId}`)
+        apiClient<PublicProfile>(`/user/profile/${encodeURIComponent(userId)}`)
             .then(setProfile)
             .catch(() => setNotFound(true))
             .finally(() => setLoading(false));

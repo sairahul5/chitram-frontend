@@ -332,7 +332,7 @@ export default function Home() {
               {accountResults.map((account) => (
                 <Link
                   key={account.id}
-                  href={`/account/${account.id}`}
+                  href={`/account/${account.username || account.id}`}
                   className="flex items-center gap-3 rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <Avatar src={account.pictureUrl} name={account.name} size="md" className="border border-[#e8ece8]" />

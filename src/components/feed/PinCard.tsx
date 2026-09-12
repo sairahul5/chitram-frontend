@@ -83,7 +83,7 @@ export function PinCard({
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(item.imageUrl);
+    navigator.clipboard.writeText(`${window.location.origin}/pin/${item.id}`);
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
@@ -410,7 +410,7 @@ export function PinCard({
               {item.creatorUsername && (
                 item.uploadedBy ? (
                   <Link
-                    href={`/account/${item.uploadedBy}`}
+                    href={`/account/${item.creatorUsername}`}
                     className="truncate font-medium text-[#d2643b] hover:underline"
                   >
                     @{item.creatorUsername}
