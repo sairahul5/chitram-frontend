@@ -50,11 +50,17 @@ export default function Home() {
     setError(false);
     try {
       if (personalized && currentUser) {
-        const recommendations = await apiClient<VisualItem[]>("/recommendations?limit=25");
-        setItems(recommendations || []);
-        setNextCursor(null);
-        setHasMore(false);
-        return;
+        try {
+          const recommendations = await apiClient<VisualItem[]>("/recommendations?limit=25");
+          if (recommendations?.length) {
+            setItems(recommendations);
+            setNextCursor(null);
+            setHasMore(false);
+            return;
+          }
+        } catch {
+          // Use the public feed while personalized recommendations are unavailable.
+        }
       }
 
       const q = query.trim() ? `&query=${encodeURIComponent(query.trim())}` : "";
