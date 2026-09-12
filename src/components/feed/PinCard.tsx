@@ -2,8 +2,9 @@
 
 import { VisualItem } from "@/types/visualItem";
 import { Avatar } from "@/components/ui/Avatar";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 
 interface PinCardProps {
   item: VisualItem;
@@ -48,6 +49,7 @@ export function PinCard({
   const [reportDescription, setReportDescription] = useState("");
   const [reportError, setReportError] = useState<string | null>(null);
   const [isReporting, setIsReporting] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [showEdit, setShowEdit] = useState(false);
   const [editTitle, setEditTitle] = useState(item.title);
   const hasTrackedView = useRef(false);
@@ -56,6 +58,8 @@ export function PinCard({
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuPanelRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   // Calculate precise aspect ratio to eliminate layout shifts (CLS = 0)
   const ratio = item.aspectRatio
@@ -70,8 +74,19 @@ export function PinCard({
   const canEdit = Boolean(onEdit && (isOwnerFeed || (currentUserId && item.uploadedBy && currentUserId === item.uploadedBy) || isAdmin));
 
   useEffect(() => {
+    const closeOtherMenus = (event: Event) => {
+      if ((event as CustomEvent<{ id: number }>).detail?.id !== item.id) {
+        setShowMenu(false);
+      }
+    };
+    window.addEventListener("chitram:close-pin-menus", closeOtherMenus);
+    return () => window.removeEventListener("chitram:close-pin-menus", closeOtherMenus);
+  }, [item.id]);
+
+  useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)
+        && menuPanelRef.current && !menuPanelRef.current.contains(e.target as Node)) {
         setShowMenu(false);
       }
     }
@@ -79,6 +94,44 @@ export function PinCard({
       document.addEventListener("mousedown", handleClickOutside);
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showMenu]);
+
+  useEffect(() => {
+    if (!showMenu) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setShowMenu(false);
+        menuButtonRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [showMenu]);
+
+  useLayoutEffect(() => {
+    if (!showMenu || !menuButtonRef.current || !menuPanelRef.current) return;
+    const updatePosition = () => {
+      const button = menuButtonRef.current?.getBoundingClientRect();
+      const panel = menuPanelRef.current?.getBoundingClientRect();
+      if (!button || !panel) return;
+      const gap = 6;
+      const top = button.bottom + panel.height + gap <= window.innerHeight
+        ? button.bottom + gap
+        : Math.max(8, button.top - panel.height - gap);
+      const left = Math.min(
+        Math.max(8, button.right - panel.width),
+        Math.max(8, window.innerWidth - panel.width - 8),
+      );
+      setMenuPosition({ top, left });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
   }, [showMenu]);
 
   const handleCopyLink = (e: React.MouseEvent) => {
@@ -268,8 +321,14 @@ export function PinCard({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setShowMenu(!showMenu);
+                if (!showMenu) {
+                  window.dispatchEvent(new CustomEvent("chitram:close-pin-menus", { detail: { id: item.id } }));
+                  const button = menuButtonRef.current?.getBoundingClientRect();
+                  if (button) setMenuPosition({ top: button.bottom + 6, left: Math.max(8, button.right - 176) });
+                }
+                setShowMenu((open) => !open);
               }}
+              ref={menuButtonRef}
               type="button"
               className="pointer-events-auto absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1f2925] shadow-md backdrop-blur-md transition hover:bg-white active:scale-95 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
               aria-label="More options"
@@ -283,33 +342,37 @@ export function PinCard({
             </button>
 
             {/* Dropdown Menu */}
-            {showMenu && (
-              <div className="pointer-events-auto absolute bottom-14 right-3 z-[100] max-h-[calc(100%_-_24px)] w-48 overflow-y-auto rounded-2xl border border-[#d8ded8] bg-white/95 p-1.5 text-sm font-medium text-[#1f2925] shadow-[0_16px_40px_rgba(31,41,37,0.2)] backdrop-blur-md animate-scale-in">
+            {showMenu && createPortal(
+              <div ref={menuPanelRef} role="menu" aria-label="Post options" style={{ top: menuPosition.top, left: menuPosition.left }} className="fixed z-50 w-44 rounded-xl border border-[#d8ded8] bg-white p-1 text-sm font-medium text-[#1f2925] shadow-[0_10px_24px_rgba(31,41,37,0.14)] animate-scale-in">
                 <button
                   onClick={() => { setShowReport(true); setShowMenu(false); }}
                   disabled={!currentUserId || !onReport}
-                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#fff5f2] disabled:cursor-not-allowed disabled:opacity-50"
+                  role="menuitem"
+                  className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-left text-[#a84f37] transition hover:bg-[#fff5f2] disabled:cursor-not-allowed disabled:opacity-50"
                 >
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full border border-current text-[11px] font-bold" aria-hidden="true">!</span>
                   <span>Report</span>
-                  <span className="text-xs text-[#a84f37]" aria-hidden="true">!</span>
                 </button>
                 <button
                   onClick={handleCopyLink}
-                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#f5f1e9]"
+                  role="menuitem"
+                  className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-left transition hover:bg-[#f5f1e9]"
                 >
-                  <span>{copied ? "Link Copied! ✓" : "Copy Link"}</span>
-                  <span className="text-xs text-[#68736d]" aria-hidden="true">↗</span>
+                  <span className="flex h-5 w-5 items-center justify-center text-base text-[#68736d]" aria-hidden="true">↗</span>
+                  <span>{copied ? "Link copied" : "Copy link"}</span>
                 </button>
                 <button
                   onClick={handleDownload}
                   disabled={isDownloading}
-                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#f5f1e9] disabled:cursor-wait disabled:opacity-60"
+                  role="menuitem"
+                  className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-left transition hover:bg-[#f5f1e9] disabled:cursor-wait disabled:opacity-60"
                 >
-                  <span>{isDownloading ? "Downloading..." : "Download Image"}</span>
-                  <span>↓</span>
+                  <span className="flex h-5 w-5 items-center justify-center text-base text-[#68736d]" aria-hidden="true">↓</span>
+                  <span>{isDownloading ? "Downloading..." : "Download image"}</span>
                 </button>
                 {canEdit && (
                   <button
+                    role="menuitem"
                     onClick={() => {
                       setEditTitle(item.title);
                       setEditCategory(item.category);
@@ -318,23 +381,25 @@ export function PinCard({
                       setShowEdit(true);
                       setShowMenu(false);
                     }}
-                    className="mt-1 flex w-full items-center justify-between border-t border-[#f0eee6] px-3 py-2.5 text-left transition hover:bg-[#f5f1e9]"
+                    className="mt-1 flex h-10 w-full items-center gap-3 border-t border-[#f0eee6] px-3 text-left transition hover:bg-[#f5f1e9]"
                   >
+                    <span className="flex h-5 w-5 items-center justify-center text-xs text-[#68736d]" aria-hidden="true">Edit</span>
                     <span>Edit details</span>
-                    <span className="text-xs text-[#68736d]" aria-hidden="true">Edit</span>
                   </button>
                 )}
                 {canDelete && (
                   <button
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="mt-1 flex w-full items-center justify-between border-t border-[#f0eee6] px-3 py-2.5 text-left text-[#d2643b] transition hover:bg-[#fff0ed] disabled:cursor-wait disabled:opacity-50"
+                    role="menuitem"
+                    className="mt-1 flex h-10 w-full items-center gap-3 border-t border-[#f0eee6] px-3 text-left text-[#d2643b] transition hover:bg-[#fff0ed] disabled:cursor-wait disabled:opacity-50"
                   >
-                    <span>{isDeleting ? "Deleting..." : "Delete Pin"}</span>
-                    <span className="text-xs" aria-hidden="true">Delete</span>
+                    <span className="flex h-5 w-5 items-center justify-center text-xs" aria-hidden="true">×</span>
+                    <span>{isDeleting ? "Deleting..." : "Delete pin"}</span>
                   </button>
                 )}
-              </div>
+              </div>,
+              document.body,
             )}
           </div>
         </div>
