@@ -15,7 +15,16 @@ export async function apiClient<T>(path: string, options?: RequestInit): Promise
     });
 
     if (!response.ok) {
-        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+        let message = `Request failed (${response.status})`;
+        try {
+            const body = await response.json() as { message?: string };
+            if (body.message) message = body.message;
+        } catch {
+            if (response.statusText) message = `${message}: ${response.statusText}`;
+        }
+        const error = new Error(message);
+        error.name = `ApiError${response.status}`;
+        throw error;
     }
 
     const text = await response.text();
