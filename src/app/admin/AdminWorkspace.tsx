@@ -38,6 +38,7 @@ type DatabaseOverview = {
     status: string;
     tableCount: number;
     totalRows: number;
+    checkedAt: string;
     tables: { name: string; rowCount: number; status: string }[];
 };
 
@@ -332,8 +333,9 @@ function PanelView({
         );
     }
 
-    const now = new Date();
-    const lastChecked = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+    const lastChecked = dbOverview
+        ? new Date(dbOverview.checkedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })
+        : "";
 
     return (
         <div>

@@ -14,7 +14,8 @@ export default function AdminOperations() {
     const [pins, setPins] = useState<Pin[]>([]);
     const [platformSettings, setPlatformSettings] = useState<Record<string, boolean>>({});
     const [activity, setActivity] = useState<Activity[]>([]);
-    const [sessionDurationDays, setSessionDurationDays] = useState(30);
+    const [sessionDurationDays, setSessionDurationDays] = useState<number | null>(null);
+    const [savingSessionDuration, setSavingSessionDuration] = useState(false);
     const [categoryName, setCategoryName] = useState("");
     const [categoryError, setCategoryError] = useState<string | null>(null);
     const [reportFilter, setReportFilter] = useState<string>("ALL");
@@ -38,7 +39,13 @@ export default function AdminOperations() {
     }
 
     useEffect(() => {
-        load().catch(() => setCategoryError("Unable to load categories and reports."));
+        let active = true;
+        queueMicrotask(() => {
+            load().catch(() => {
+                if (active) setCategoryError("Unable to load categories, reports, and settings.");
+            });
+        });
+        return () => { active = false; };
     }, []);
 
     async function createCategory() {
@@ -85,11 +92,19 @@ export default function AdminOperations() {
     }
 
     async function updateSessionDuration(days: number) {
-        const saved = await apiClient<{ sessionDurationDays: number }>("/admin/settings/session", {
-            method: "PUT",
-            body: JSON.stringify({ sessionDurationDays: days }),
-        });
-        setSessionDurationDays(saved.sessionDurationDays);
+        setSavingSessionDuration(true);
+        setCategoryError(null);
+        try {
+            const saved = await apiClient<{ sessionDurationDays: number }>("/admin/settings/session", {
+                method: "PUT",
+                body: JSON.stringify({ sessionDurationDays: days }),
+            });
+            setSessionDurationDays(saved.sessionDurationDays);
+        } catch (error) {
+            setCategoryError(error instanceof Error ? error.message : "Unable to update session duration.");
+        } finally {
+            setSavingSessionDuration(false);
+        }
     }
 
     const filteredReports = reports.filter((report) => {
@@ -109,7 +124,7 @@ export default function AdminOperations() {
     };
 
     return (
-        <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <div className="mt-6 grid items-start gap-6 xl:grid-cols-2">
             <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                 <div className="border-b border-[#e8ece8] px-6 py-5">
                     <h2 className="font-semibold">Categories</h2>
@@ -200,7 +215,19 @@ export default function AdminOperations() {
             </section>
             <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                 <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Session duration</h2><p className="mt-1 text-sm text-[#68736d]">Controls how long users remain signed in before they need to authenticate again.</p></div>
-                <div className="px-6 py-5"><select value={sessionDurationDays} onChange={(event) => void updateSessionDuration(Number(event.target.value))} className="w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm"><option value={7}>7 days</option><option value={30}>30 days</option><option value={90}>90 days</option><option value={365}>1 year</option></select><p className="mt-2 text-xs text-[#68736d]">New sign-ins use this value. Existing sessions keep their current expiry.</p></div>
+                <div className="px-6 py-5">
+                    {sessionDurationDays === null ? (
+                        <p className="text-sm text-[#68736d]">Loading current session duration...</p>
+                    ) : (
+                        <select value={sessionDurationDays} disabled={savingSessionDuration} onChange={(event) => void updateSessionDuration(Number(event.target.value))} className="w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm disabled:opacity-60">
+                            <option value={7}>7 days</option>
+                            <option value={30}>30 days</option>
+                            <option value={90}>90 days</option>
+                            <option value={365}>1 year</option>
+                        </select>
+                    )}
+                    <p className="mt-2 text-xs text-[#68736d]">New sign-ins use this value. Existing sessions keep their current expiry.</p>
+                </div>
             </section>
         </div>
     );
