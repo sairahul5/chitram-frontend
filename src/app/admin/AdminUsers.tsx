@@ -2,7 +2,7 @@
 
 import { apiClient } from "@/lib/apiClient";
 import { Avatar } from "@/components/ui/Avatar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type AdminUser = {
     id: number;
@@ -30,6 +30,8 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
     const [error, setError] = useState<string | null>(null);
     const [search, setSearch] = useState("");
     const [processingUserId, setProcessingUserId] = useState<number | null>(null);
+    const [openRoleMenuId, setOpenRoleMenuId] = useState<number | null>(null);
+    const roleMenuRef = useRef<HTMLDivElement>(null);
 
     const loadUsers = (query = search) => {
         apiClient<AdminUser[]>(`/admin/users?search=${encodeURIComponent(query)}`)
@@ -52,6 +54,18 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
             setLoadingUsers(false);
         }
     }, [liveUsers]);
+
+    useEffect(() => {
+        function closeRoleMenu(event: MouseEvent) {
+            if (roleMenuRef.current && !roleMenuRef.current.contains(event.target as Node)) {
+                setOpenRoleMenuId(null);
+            }
+        }
+        if (openRoleMenuId !== null) {
+            document.addEventListener("mousedown", closeRoleMenu);
+        }
+        return () => document.removeEventListener("mousedown", closeRoleMenu);
+    }, [openRoleMenuId]);
 
     async function changeRole(userId: number, role: string) {
         setError(null);
@@ -161,15 +175,42 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
                                     <td className="px-6 py-4 text-xs text-[#68736d]">{user.pins ?? 0} pins · {user.likes ?? 0} likes<br />{user.followers ?? 0} followers · {user.following ?? 0} following</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <select
-                                                disabled={updatingUserId === user.id}
-                                                className="rounded-lg border border-[#d8ded8] bg-white px-3 py-2 text-sm disabled:opacity-60 transition"
-                                                onChange={(event) => changeRole(user.id, event.target.value)}
-                                                value={user.role.includes("ADMIN") ? "ADMIN" : "USER"}
-                                            >
-                                                <option value="USER">User</option>
-                                                <option value="ADMIN">Admin</option>
-                                            </select>
+                                            <div className="relative" ref={openRoleMenuId === user.id ? roleMenuRef : undefined}>
+                                                <button
+                                                    type="button"
+                                                    disabled={updatingUserId === user.id}
+                                                    onClick={() => setOpenRoleMenuId(openRoleMenuId === user.id ? null : user.id)}
+                                                    className="flex min-w-[76px] items-center justify-between gap-3 rounded-lg border border-[#d8ded8] bg-white px-3 py-2 text-left text-xs font-semibold text-[#1f2925] shadow-sm transition hover:border-[#438268] disabled:cursor-wait disabled:opacity-60"
+                                                    aria-haspopup="menu"
+                                                    aria-expanded={openRoleMenuId === user.id}
+                                                >
+                                                    {user.role.includes("ADMIN") ? "Admin" : "User"}
+                                                    <span className={`text-[#68736d] transition-transform ${openRoleMenuId === user.id ? "rotate-180" : ""}`} aria-hidden="true">⌄</span>
+                                                </button>
+                                                {openRoleMenuId === user.id && (
+                                                    <div className="absolute right-0 top-full z-30 mt-2 w-32 overflow-hidden rounded-xl border border-[#d8ded8] bg-white p-1 shadow-[0_12px_30px_rgba(31,41,37,0.14)]" role="menu">
+                                                        {[{ value: "USER", label: "User" }, { value: "ADMIN", label: "Admin" }].map((option) => {
+                                                            const selected = (user.role.includes("ADMIN") ? "ADMIN" : "USER") === option.value;
+                                                            return (
+                                                                <button
+                                                                    key={option.value}
+                                                                    type="button"
+                                                                    role="menuitem"
+                                                                    disabled={selected}
+                                                                    onClick={() => {
+                                                                        setOpenRoleMenuId(null);
+                                                                        void changeRole(user.id, option.value);
+                                                                    }}
+                                                                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-semibold transition ${selected ? "bg-[#e9eee8] text-[#438268]" : "text-[#1f2925] hover:bg-[#f5f1e9]"}`}
+                                                                >
+                                                                    {option.label}
+                                                                    {selected && <span aria-hidden="true">✓</span>}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
                                             {updatingUserId === user.id && (
                                                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#d2643b] border-t-transparent" />
                                             )}
