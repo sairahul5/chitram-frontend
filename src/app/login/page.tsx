@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api").replace(/\/api\/?$/, "");
+const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-og9p.onrender.com/api").replace(/\/api\/?$/, "");
 
 export default function LoginPage() {
     return (

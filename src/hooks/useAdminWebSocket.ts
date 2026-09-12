@@ -63,7 +63,7 @@ export function useAdminWebSocket(handlers: AdminWebSocketHandlers): ConnectionS
     useEffect(() => { handlersRef.current = handlers; }, [handlers]);
 
     useEffect(() => {
-        const apiBase = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api")
+        const apiBase = (process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-og9p.onrender.com/api")
             .replace(/\/api\/?$/, "");
 
         const client = new Client({

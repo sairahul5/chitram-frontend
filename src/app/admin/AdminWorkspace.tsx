@@ -46,7 +46,7 @@ export default function AdminWorkspace() {
     const [savedPinIds, setSavedPinIds] = useState<number[]>([]);
     const [requiresLogin, setRequiresLogin] = useState(false);
     const [liveUsers, setLiveUsers] = useState<AdminUser[] | null>(null);
-    const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api").replace(/\/api\/?$/, "");
+    const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-og9p.onrender.com/api").replace(/\/api\/?$/, "");
 
     // ── Initial REST loads ───────────────────────────────────────────────────
     useEffect(() => {
