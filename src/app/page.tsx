@@ -148,24 +148,7 @@ export default function Home() {
   };
 
   const handlePinView = (id: number) => {
-    if (!currentUser) return;
-    try {
-      if (window.sessionStorage.getItem("chitram-interactions-unavailable") === "true") return;
-    } catch {
-      // Storage may be unavailable in privacy-restricted browsers.
-    }
-    apiClient("/recommendations/interactions", {
-      method: "POST",
-      body: JSON.stringify({ pinId: id, type: "VIEW" }),
-    }).catch((error: unknown) => {
-      if (error instanceof Error && error.name === "ApiError503") {
-        try {
-          window.sessionStorage.setItem("chitram-interactions-unavailable", "true");
-        } catch {
-          // Ignore storage failures; tracking remains best effort.
-        }
-      }
-    });
+    void id;
   };
 
   const handleLikeToggle = async (id: number, shouldLike: boolean) => {
