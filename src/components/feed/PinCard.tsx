@@ -43,6 +43,7 @@ export function PinCard({
   const [likeError, setLikeError] = useState<string | null>(null);
   const [showEdit, setShowEdit] = useState(false);
   const [editTitle, setEditTitle] = useState(item.title);
+  const hasTrackedView = useRef(false);
   const [editCategory, setEditCategory] = useState(item.category);
   const [editDescription, setEditDescription] = useState(item.description ?? "");
   const [isSavingEdit, setIsSavingEdit] = useState(false);
@@ -180,7 +181,10 @@ export function PinCard({
             decoding="async"
             onLoad={() => {
               setIsLoaded(true);
-              onView?.(item.id);
+              if (!hasTrackedView.current) {
+                hasTrackedView.current = true;
+                onView?.(item.id);
+              }
             }}
             className={`w-full h-full object-cover transition-all duration-500 ease-out ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
               }`}
