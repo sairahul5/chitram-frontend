@@ -205,6 +205,7 @@ export default function AdminOperations() {
                     {pins.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No pins available.</p>}
                 </div>
             </section>
+            <div className="flex flex-col gap-6">
             <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                 <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Platform settings</h2><p className="mt-1 text-sm text-[#68736d]">Small operational switches for the early platform.</p></div>
                 <div className="divide-y divide-[#e8ece8]">{[["registration_enabled", "Registration"], ["image_uploads_enabled", "Image uploads"], ["public_profiles_enabled", "Public profiles"]].map(([key, label]) => <div key={key} className="flex items-center justify-between px-6 py-4"><span className="text-sm font-medium">{label}</span><div className="checkbox-wrapper-35"><input checked={Boolean(platformSettings[key])} id={`platform-${key}`} name={`platform-${key}`} onChange={(event) => void togglePlatformSetting(key, event.target.checked)} type="checkbox" className="switch" /><label htmlFor={`platform-${key}`}><span className="switch-x-text"> </span><span className="switch-x-toggletext"><span className="switch-x-unchecked"><span className="switch-x-hiddenlabel">Unchecked: </span>OFF</span><span className="switch-x-checked"><span className="switch-x-hiddenlabel">Checked: </span>ON</span></span></label></div></div>)}</div>
@@ -229,6 +230,7 @@ export default function AdminOperations() {
                     <p className="mt-2 text-xs text-[#68736d]">New sign-ins use this value. Existing sessions keep their current expiry.</p>
                 </div>
             </section>
+            </div>
         </div>
     );
 }
