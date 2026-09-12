@@ -83,7 +83,9 @@ export function PinCard({
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(`${window.location.origin}/pin/${item.id}`);
+    const creator = item.creatorUsername ? `/${encodeURIComponent(item.creatorUsername)}` : "";
+    const key = item.shareKey || String(item.id);
+    navigator.clipboard.writeText(`${window.location.origin}/pin${creator}/${encodeURIComponent(key)}`);
     setCopied(true);
     setTimeout(() => {
       setCopied(false);
@@ -261,17 +263,15 @@ export function PinCard({
               {item.category}
             </span>
           </div>
-        </div>
-
-        {/* Image menu stays above the crop so its dropdown is never clipped. */}
-        <div className="absolute bottom-3 right-3 z-20" ref={menuRef}>
+          {/* Image menu stays inside the image holder and opens above its button. */}
+          <div className="pointer-events-none absolute inset-0 z-20" ref={menuRef}>
           <button
             onClick={(e) => {
               e.stopPropagation();
               setShowMenu(!showMenu);
             }}
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[#1f2925] shadow-md backdrop-blur-md transition hover:bg-white active:scale-95 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+            className="pointer-events-auto absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1f2925] shadow-md backdrop-blur-md transition hover:bg-white active:scale-95 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
             aria-label="More options"
             aria-expanded={showMenu}
           >
@@ -284,26 +284,26 @@ export function PinCard({
 
           {/* Dropdown Menu */}
           {showMenu && (
-            <div className="absolute right-0 bottom-11 w-44 rounded-2xl border border-[#e4dcd3] bg-white py-2 text-xs font-medium text-[#1f2925] shadow-xl animate-scale-in">
+            <div className="pointer-events-auto absolute bottom-14 right-3 z-[100] max-h-[calc(100%_-_24px)] w-48 overflow-y-auto rounded-2xl border border-[#d8ded8] bg-white/95 p-1.5 text-sm font-medium text-[#1f2925] shadow-[0_16px_40px_rgba(31,41,37,0.2)] backdrop-blur-md animate-scale-in">
               <button
                 onClick={() => { setShowReport(true); setShowMenu(false); }}
                 disabled={!currentUserId || !onReport}
-                className="flex w-full items-center justify-between border-t border-[#f0eee6] px-4 py-2 text-left transition hover:bg-[#fff5f2] disabled:opacity-50"
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#fff5f2] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span>Report</span>
-                <span>⚑</span>
+                <span className="text-xs text-[#a84f37]" aria-hidden="true">!</span>
               </button>
               <button
                 onClick={handleCopyLink}
-                className="flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-[#f5f1e9]"
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#f5f1e9]"
               >
                 <span>{copied ? "Link Copied! ✓" : "Copy Link"}</span>
-                <span>🔗</span>
+                <span className="text-xs text-[#68736d]" aria-hidden="true">↗</span>
               </button>
               <button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-[#f5f1e9]"
+                className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#f5f1e9] disabled:cursor-wait disabled:opacity-60"
               >
                 <span>{isDownloading ? "Downloading..." : "Download Image"}</span>
                 <span>↓</span>
@@ -318,24 +318,25 @@ export function PinCard({
                     setShowEdit(true);
                     setShowMenu(false);
                   }}
-                  className="flex w-full items-center justify-between border-t border-[#f0eee6] px-4 py-2 text-left transition hover:bg-[#f5f1e9]"
+                  className="mt-1 flex w-full items-center justify-between border-t border-[#f0eee6] px-3 py-2.5 text-left transition hover:bg-[#f5f1e9]"
                 >
                   <span>Edit details</span>
-                  <span>✎</span>
+                  <span className="text-xs text-[#68736d]" aria-hidden="true">Edit</span>
                 </button>
               )}
               {canDelete && (
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="flex w-full items-center justify-between border-t border-[#f0eee6] px-4 py-2 text-left text-[#d2643b] transition hover:bg-[#fff0ed] disabled:opacity-50"
+                  className="mt-1 flex w-full items-center justify-between border-t border-[#f0eee6] px-3 py-2.5 text-left text-[#d2643b] transition hover:bg-[#fff0ed] disabled:cursor-wait disabled:opacity-50"
                 >
                   <span>{isDeleting ? "Deleting..." : "Delete Pin"}</span>
-                  <span>🗑️</span>
+                  <span className="text-xs" aria-hidden="true">Delete</span>
                 </button>
               )}
             </div>
           )}
+          </div>
         </div>
       </div>
 

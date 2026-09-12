@@ -30,6 +30,7 @@ export default function PublicAccountPage() {
     const [reportError, setReportError] = useState<string | null>(null);
     const [reportSuccess, setReportSuccess] = useState(false);
     const [isReporting, setIsReporting] = useState(false);
+    const [profileCopied, setProfileCopied] = useState(false);
     const [currentUser, setCurrentUser] = useState<{ id: number } | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -87,6 +88,23 @@ export default function PublicAccountPage() {
         }
     };
 
+    const handleShareProfile = async () => {
+        if (!profile?.username) return;
+        const shareUrl = `${window.location.origin}/account/${encodeURIComponent(profile.username)}`;
+        try {
+            if (navigator.share) {
+                await navigator.share({ title: `${profile.name} on Chitram`, url: shareUrl });
+            } else {
+                await navigator.clipboard.writeText(shareUrl);
+                setProfileCopied(true);
+                window.setTimeout(() => setProfileCopied(false), 1500);
+            }
+        } catch {
+            // Closing the native share sheet is not an error.
+        }
+        setShowMenu(false);
+    };
+
     if (loading) {
         return (
             <main className="relative flex min-h-screen items-center justify-center bg-[#f5f1e9] text-[#1f2925]" aria-label="Loading account">
@@ -131,7 +149,7 @@ export default function PublicAccountPage() {
                         {profile.username && <p className="mt-1 text-sm font-semibold text-[#d2643b]">@{profile.username}</p>}
                         <p className="mt-2 text-xs text-[#68736d]">{profile.creationsCount} posts · {profile.followersCount} followers</p>
                     </div>
-                    {!isOwnProfile && currentUser && (
+                    {profile.username && (
                         <div className="relative" ref={menuRef}>
                             <button
                                 onClick={() => setShowMenu(!showMenu)}
@@ -149,12 +167,21 @@ export default function PublicAccountPage() {
                             {showMenu && (
                                 <div className="absolute right-0 top-11 w-44 rounded-2xl border border-[#e4dcd3] bg-white py-2 text-xs font-medium text-[#1f2925] shadow-xl z-20 animate-scale-in">
                                     <button
+                                        onClick={() => void handleShareProfile()}
+                                        className="flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-[#f5f1e9]"
+                                    >
+                                        <span>{profileCopied ? "Profile link copied" : "Share profile"}</span>
+                                        <span aria-hidden="true">↗</span>
+                                    </button>
+                                    {currentUser && !isOwnProfile && (
+                                    <button
                                         onClick={() => { setShowReport(true); setShowMenu(false); }}
                                         className="flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-[#fff5f2]"
                                     >
                                         <span>Report account</span>
                                         <span>⚑</span>
                                     </button>
+                                    )}
                                 </div>
                             )}
                         </div>

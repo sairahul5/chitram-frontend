@@ -17,6 +17,7 @@ export interface VisualItem {
   creatorPictureUrl?: string | null;
   likeCount?: number;
   likedByCurrentUser?: boolean;
+  shareKey?: string | null;
 }
 
 export interface VisualFeedResponse {
