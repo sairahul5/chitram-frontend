@@ -19,6 +19,7 @@ interface MasonryFeedProps {
   onSaveToggle?: (id: number, shouldSave: boolean) => Promise<void>;
   onView?: (id: number) => void;
   onLikeToggle?: (id: number, shouldLike: boolean) => Promise<{ liked: boolean; likeCount: number }>;
+  onReport?: (id: number, reason: string, description: string) => Promise<void>;
   emptyTitle?: string;
   emptySubtitle?: string;
 }
@@ -40,6 +41,7 @@ export function MasonryFeed({
   onSaveToggle,
   onView,
   onLikeToggle,
+  onReport,
   emptyTitle = "No posts discovered yet",
   emptySubtitle = "Check back soon or publish your own visual creation!",
 }: MasonryFeedProps) {
@@ -122,6 +124,7 @@ export function MasonryFeed({
             onSaveToggle={onSaveToggle}
             onView={onView}
             onLikeToggle={onLikeToggle}
+            onReport={onReport}
           />
         ))}
       </div>

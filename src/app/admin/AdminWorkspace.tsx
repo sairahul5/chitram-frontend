@@ -34,6 +34,13 @@ type AdminUser = {
     following?: number;
 };
 
+type DatabaseOverview = {
+    status: string;
+    tableCount: number;
+    totalRows: number;
+    tables: { name: string; rowCount: number; status: string }[];
+};
+
 // Merge a WsAdminDashboard (no `change` field) into AdminDashboard safely
 function mergeDashboard(incoming: WsAdminDashboard): AdminDashboard {
     return {
@@ -56,6 +63,7 @@ export default function AdminWorkspace() {
     const [liveUsers, setLiveUsers] = useState<AdminUser[] | null>(null);
     const [recommendationsEnabled, setRecommendationsEnabled] = useState(true);
     const [savingRecommendationSetting, setSavingRecommendationSetting] = useState(false);
+    const [dbOverview, setDbOverview] = useState<DatabaseOverview | null>(null);
     const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-og9p.onrender.com/api").replace(/\/api\/?$/, "");
 
     // ── Initial REST loads ───────────────────────────────────────────────────
@@ -92,6 +100,12 @@ export default function AdminWorkspace() {
             .catch(() => setSavedPinIds([]));
     }, []);
 
+    useEffect(() => {
+        apiClient<DatabaseOverview>("/admin/database/overview")
+            .then(setDbOverview)
+            .catch(() => undefined);
+    }, []);
+
     // ── WebSocket real-time handlers ─────────────────────────────────────────
     const handleDashboardUpdate = useCallback((data: WsAdminDashboard) => {
         setDashboard(mergeDashboard(data));
@@ -103,7 +117,6 @@ export default function AdminWorkspace() {
 
     const handleNewImage = useCallback((item: WsVisualItem) => {
         setImages((prev) => {
-            // Avoid duplicates
             if (prev.some((p) => p.id === item.id)) return prev;
             return [item as unknown as VisualItem, ...prev];
         });
@@ -120,11 +133,10 @@ export default function AdminWorkspace() {
         onImageDeleted: handleImageDeleted,
     });
 
-    // ── Admin delete (also handled by WS, but keep optimistic UI) ───────────
+    // ── Admin actions ───────────────────────────────────────────────────────
     const handleDeletePin = async (id: number) => {
         try {
             await apiClient(`/visual-items/${id}`, { method: "DELETE" });
-            // WS will also push the deletion; filter here for instant feedback
             setImages((prev) => prev.filter((item) => item.id !== id));
         } catch (err) {
             alert("Failed to delete pin: " + (err instanceof Error ? err.message : "Unknown error"));
@@ -147,6 +159,10 @@ export default function AdminWorkspace() {
         );
     };
 
+    const handleReport = async (id: number, reason: string, description: string) => {
+        await apiClient("/reports", { method: "POST", body: JSON.stringify({ targetType: "PIN", targetId: id, reason, description }) });
+    };
+
     return (
         <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">
             <header className="sticky top-0 z-10 border-b border-[#d8ded8] bg-[#f5f1e9]/95 backdrop-blur">
@@ -163,7 +179,6 @@ export default function AdminWorkspace() {
                         </button>
                     </nav>
 
-                    {/* Live connection indicator */}
                     <LiveIndicator status={wsStatus} />
 
                     <span className="hidden rounded-full bg-[#e9eee8] px-3 py-2 text-xs font-semibold text-[#68736d] sm:inline-flex">Admin workspace</span>
@@ -207,6 +222,7 @@ export default function AdminWorkspace() {
                                 setSavingRecommendationSetting(false);
                             }
                         }}
+                        dbOverview={dbOverview}
                     />
                 ) : (
                     <>
@@ -229,6 +245,7 @@ export default function AdminWorkspace() {
                                 onEditPin={handleEditPin}
                                 savedPinIds={savedPinIds}
                                 onSaveToggle={handleSaveToggle}
+                                onReport={handleReport}
                                 emptyTitle="No visual items yet"
                                 emptySubtitle="Images uploaded to Supabase Storage will appear here."
                             />
@@ -268,6 +285,7 @@ function PanelView({
     recommendationsEnabled,
     savingRecommendationSetting,
     onRecommendationsEnabledChange,
+    dbOverview,
 }: {
     dashboard: AdminDashboard | null;
     error: string | null;
@@ -278,6 +296,7 @@ function PanelView({
     recommendationsEnabled: boolean;
     savingRecommendationSetting: boolean;
     onRecommendationsEnabledChange: (enabled: boolean) => Promise<void>;
+    dbOverview: DatabaseOverview | null;
 }) {
     if (error) {
         return (
@@ -312,6 +331,9 @@ function PanelView({
             </div>
         );
     }
+
+    const now = new Date();
+    const lastChecked = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
 
     return (
         <div>
@@ -358,17 +380,67 @@ function PanelView({
             <section className="mt-6 overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                 <div className="flex items-center justify-between border-b border-[#e8ece8] px-6 py-5">
                     <div>
-                        <h2 className="font-semibold">Database tables</h2>
-                        <p className="mt-1 text-sm text-[#68736d]">Tables currently present in the Chitram database.</p>
+                        <h2 className="font-semibold">Database overview</h2>
+                        <p className="mt-1 text-sm text-[#68736d]">Live information from the Chitram PostgreSQL database.</p>
                     </div>
-                    <span className="rounded-full bg-[#e9eee8] px-3 py-1 text-xs font-semibold text-[#438268]">Read only</span>
+                    {dbOverview && (
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs text-[#68736d]">Last checked: {lastChecked}</span>
+                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${dbOverview.status === "CONNECTED" ? "bg-[#e9eee8] text-[#438268]" : "bg-[#fff5f2] text-[#a84f37]"}`}>
+                                {dbOverview.status === "CONNECTED" ? "Healthy" : "Error"}
+                            </span>
+                        </div>
+                    )}
                 </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[520px] text-left text-sm">
-                        <thead className="bg-[#f8faf7] text-xs uppercase tracking-[0.12em] text-[#68736d]"><tr><th className="px-6 py-4 font-semibold">Table</th><th className="px-6 py-4 font-semibold">Rows</th><th className="px-6 py-4 font-semibold">Status</th></tr></thead>
-                        <tbody>{dashboard.tables.map((table) => <tr className="border-t border-[#e8ece8] transition-colors" key={table.name}><td className="px-6 py-4 font-medium">{table.name}</td><td className="px-6 py-4 text-[#68736d] tabular-nums">{table.rows.toLocaleString()}</td><td className="px-6 py-4"><span className={table.status === "Healthy" ? "text-[#438268]" : "text-[#d2643b]"}>{table.status}</span></td></tr>)}</tbody>
-                    </table>
-                </div>
+                {dbOverview ? (
+                    <>
+                        <div className="grid grid-cols-3 gap-4 border-b border-[#e8ece8] px-6 py-5">
+                            <div>
+                                <p className="text-xs text-[#68736d]">Database Status</p>
+                                <p className={`mt-1 text-sm font-semibold ${dbOverview.status === "CONNECTED" ? "text-[#438268]" : "text-[#a84f37]"}`}>{dbOverview.status}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-[#68736d]">Tables</p>
+                                <p className="mt-1 text-sm font-semibold">{dbOverview.tableCount}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-[#68736d]">Total Rows</p>
+                                <p className="mt-1 text-sm font-semibold tabular-nums">{dbOverview.totalRows.toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full min-w-[520px] text-left text-sm">
+                                <thead className="bg-[#f8faf7] text-xs uppercase tracking-[0.12em] text-[#68736d]">
+                                    <tr>
+                                        <th className="px-6 py-4 font-semibold">Table</th>
+                                        <th className="px-6 py-4 font-semibold">Rows</th>
+                                        <th className="px-6 py-4 font-semibold">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {dbOverview.tables.map((table) => (
+                                        <tr className="border-t border-[#e8ece8] transition-colors" key={table.name}>
+                                            <td className="px-6 py-4 font-medium">{table.name}</td>
+                                            <td className="px-6 py-4 text-[#68736d] tabular-nums">{table.rowCount.toLocaleString()}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${table.status === "HEALTHY" ? "bg-[#e9eee8] text-[#438268]" : table.status === "WARNING" ? "bg-[#fef3cd] text-[#856404]" : "bg-[#fff5f2] text-[#a84f37]"}`}>
+                                                    {table.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
+                ) : (
+                    <div className="px-6 py-8 text-center">
+                        <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#e4dcd3]">
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#68736d] border-t-transparent" />
+                        </div>
+                        <p className="mt-3 text-sm text-[#68736d]">Loading database information...</p>
+                    </div>
+                )}
             </section>
             <section className="mt-6 overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                 <div className="border-b border-[#e8ece8] px-6 py-5">

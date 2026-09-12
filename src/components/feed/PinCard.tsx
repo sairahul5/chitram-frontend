@@ -16,6 +16,7 @@ interface PinCardProps {
   onSaveToggle?: (id: number, shouldSave: boolean) => Promise<void>;
   onView?: (id: number) => void;
   onLikeToggle?: (id: number, shouldLike: boolean) => Promise<{ liked: boolean; likeCount: number }>;
+  onReport?: (id: number, reason: string, description: string) => Promise<void>;
 }
 
 export function PinCard({
@@ -29,6 +30,7 @@ export function PinCard({
   onSaveToggle,
   onView,
   onLikeToggle,
+  onReport,
 }: PinCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -41,6 +43,11 @@ export function PinCard({
   const [likeCount, setLikeCount] = useState(item.likeCount ?? 0);
   const [isLiking, setIsLiking] = useState(false);
   const [likeError, setLikeError] = useState<string | null>(null);
+  const [showReport, setShowReport] = useState(false);
+  const [reportReason, setReportReason] = useState("SPAM");
+  const [reportDescription, setReportDescription] = useState("");
+  const [reportError, setReportError] = useState<string | null>(null);
+  const [isReporting, setIsReporting] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [editTitle, setEditTitle] = useState(item.title);
   const hasTrackedView = useRef(false);
@@ -160,6 +167,23 @@ export function PinCard({
     }
   };
 
+  const handleReportSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!onReport || !currentUserId) return;
+    setIsReporting(true);
+    setReportError(null);
+    try {
+      await onReport(item.id, reportReason, reportDescription.trim());
+      setShowReport(false);
+      setShowMenu(false);
+      setReportDescription("");
+    } catch (error) {
+      setReportError(error instanceof Error ? error.message : "Unable to submit report.");
+    } finally {
+      setIsReporting(false);
+    }
+  };
+
   return (
     <div className="group mb-3 break-inside-avoid sm:mb-5">
       {/* Visual Image Container with reserved aspect ratio */}
@@ -262,6 +286,14 @@ export function PinCard({
           {showMenu && (
             <div className="absolute right-0 bottom-11 w-44 rounded-2xl border border-[#e4dcd3] bg-white py-2 text-xs font-medium text-[#1f2925] shadow-xl animate-scale-in">
               <button
+                onClick={() => { setShowReport(true); setShowMenu(false); }}
+                disabled={!currentUserId || !onReport}
+                className="flex w-full items-center justify-between border-t border-[#f0eee6] px-4 py-2 text-left transition hover:bg-[#fff5f2] disabled:opacity-50"
+              >
+                <span>Report</span>
+                <span>⚑</span>
+              </button>
+              <button
                 onClick={handleCopyLink}
                 className="flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-[#f5f1e9]"
               >
@@ -320,6 +352,16 @@ export function PinCard({
           <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} maxLength={500} rows={2} className="mt-2 w-full resize-none rounded-xl border border-[#d8ded8] px-3 py-2 text-sm outline-none focus:border-[#1f2925]" placeholder="Description (optional)" />
           {editError && <p className="mt-2 text-xs font-medium text-[#a84f37]">{editError}</p>}
           <button type="submit" disabled={isSavingEdit} className="mt-3 w-full rounded-xl bg-[#1f2925] px-3 py-2 text-xs font-bold text-white disabled:opacity-50">{isSavingEdit ? "Saving..." : "Save details"}</button>
+        </form>
+      )}
+
+      {showReport && (
+        <form onSubmit={handleReportSubmit} className="mt-3 rounded-2xl border border-[#e4dcd3] bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between gap-3"><h4 className="text-sm font-bold">Report post</h4><button type="button" onClick={() => setShowReport(false)} className="text-xs font-semibold text-[#68736d]">Cancel</button></div>
+          <select value={reportReason} onChange={(event) => setReportReason(event.target.value)} className="mt-3 w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm"><option value="SPAM">Spam</option><option value="NUDITY">Nudity or sexual content</option><option value="VIOLENCE">Violence or graphic content</option><option value="HARASSMENT">Hate or harassment</option><option value="COPYRIGHT">Copyright violation</option><option value="MISLEADING">Misleading content</option><option value="OTHER">Other</option></select>
+          <textarea value={reportDescription} onChange={(event) => setReportDescription(event.target.value)} maxLength={1000} rows={3} placeholder="Additional details (optional)" className="mt-2 w-full resize-none rounded-xl border border-[#d8ded8] px-3 py-2 text-sm" />
+          {reportError && <p className="mt-2 text-xs text-[#a84f37]">{reportError}</p>}
+          <button type="submit" disabled={isReporting} className="mt-3 w-full rounded-xl bg-[#1f2925] px-3 py-2 text-xs font-bold text-white disabled:opacity-50">{isReporting ? "Submitting..." : "Submit report"}</button>
         </form>
       )}
 

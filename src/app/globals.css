@@ -4,7 +4,7 @@
   display: none;
 }
 
-.checkbox-wrapper-35 .switch + label {
+.checkbox-wrapper-35 .switch+label {
   align-items: center;
   color: #68736d;
   cursor: pointer;
@@ -15,13 +15,13 @@
   user-select: none;
 }
 
-.checkbox-wrapper-35 .switch + label::before,
-.checkbox-wrapper-35 .switch + label::after {
+.checkbox-wrapper-35 .switch+label::before,
+.checkbox-wrapper-35 .switch+label::after {
   content: "";
   display: block;
 }
 
-.checkbox-wrapper-35 .switch + label::before {
+.checkbox-wrapper-35 .switch+label::before {
   background-color: #68736d;
   border-radius: 500px;
   height: 15px;
@@ -30,7 +30,7 @@
   width: 25px;
 }
 
-.checkbox-wrapper-35 .switch + label::after {
+.checkbox-wrapper-35 .switch+label::after {
   background-color: #fff;
   border-radius: 13px;
   box-shadow: 0 3px 1px 0 rgba(37, 34, 71, 0.05), 0 2px 2px 0 rgba(37, 34, 71, 0.1), 0 3px 3px 0 rgba(37, 34, 71, 0.05);
@@ -42,12 +42,12 @@
   width: 13px;
 }
 
-.checkbox-wrapper-35 .switch + label .switch-x-text {
+.checkbox-wrapper-35 .switch+label .switch-x-text {
   display: block;
   margin-right: 0.3em;
 }
 
-.checkbox-wrapper-35 .switch + label .switch-x-toggletext {
+.checkbox-wrapper-35 .switch+label .switch-x-toggletext {
   display: block;
   font-weight: 700;
   height: 15px;
@@ -56,48 +56,48 @@
   width: 42px;
 }
 
-.checkbox-wrapper-35 .switch + label .switch-x-unchecked,
-.checkbox-wrapper-35 .switch + label .switch-x-checked {
+.checkbox-wrapper-35 .switch+label .switch-x-unchecked,
+.checkbox-wrapper-35 .switch+label .switch-x-checked {
   left: 0;
   position: absolute;
   top: 0;
   transition: transform 0.125s ease-out, opacity 0.125s ease-out;
 }
 
-.checkbox-wrapper-35 .switch + label .switch-x-unchecked {
+.checkbox-wrapper-35 .switch+label .switch-x-unchecked {
   opacity: 1;
   transform: none;
 }
 
-.checkbox-wrapper-35 .switch + label .switch-x-checked {
+.checkbox-wrapper-35 .switch+label .switch-x-checked {
   opacity: 0;
   transform: translate3d(0, 100%, 0);
 }
 
-.checkbox-wrapper-35 .switch + label .switch-x-hiddenlabel {
+.checkbox-wrapper-35 .switch+label .switch-x-hiddenlabel {
   position: absolute;
   visibility: hidden;
 }
 
-.checkbox-wrapper-35 .switch:checked + label::before {
+.checkbox-wrapper-35 .switch:checked+label::before {
   background-color: #438268;
 }
 
-.checkbox-wrapper-35 .switch:checked + label::after {
+.checkbox-wrapper-35 .switch:checked+label::after {
   transform: translate3d(10px, 0, 0);
 }
 
-.checkbox-wrapper-35 .switch:checked + label .switch-x-unchecked {
+.checkbox-wrapper-35 .switch:checked+label .switch-x-unchecked {
   opacity: 0;
   transform: translate3d(0, -100%, 0);
 }
 
-.checkbox-wrapper-35 .switch:checked + label .switch-x-checked {
+.checkbox-wrapper-35 .switch:checked+label .switch-x-checked {
   opacity: 1;
   transform: none;
 }
 
-.checkbox-wrapper-35 .switch:disabled + label {
+.checkbox-wrapper-35 .switch:disabled+label {
   cursor: wait;
   opacity: 0.6;
 }

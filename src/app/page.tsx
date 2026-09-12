@@ -168,6 +168,10 @@ export default function Home() {
     return result;
   };
 
+  const handleReport = async (id: number, reason: string, description: string) => {
+    await apiClient("/reports", { method: "POST", body: JSON.stringify({ targetType: "PIN", targetId: id, reason, description }) });
+  };
+
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     if (!value.trim().replace(/^@/, "")) {
@@ -358,6 +362,7 @@ export default function Home() {
           onSaveToggle={handleSaveToggle}
           onView={handlePinView}
           onLikeToggle={handleLikeToggle}
+          onReport={handleReport}
           emptyTitle={selectedCategory === "All" ? "No posts available yet" : `No posts in ${selectedCategory}`}
           emptySubtitle="Be the first to share an image in this category!"
         />
