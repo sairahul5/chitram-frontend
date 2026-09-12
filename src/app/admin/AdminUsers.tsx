@@ -36,7 +36,7 @@ export default function AdminUsers({ liveUsers }: AdminUsersProps) {
     // When the parent receives a fresh user list from the WebSocket, apply it
     useEffect(() => {
         if (liveUsers && liveUsers.length > 0) {
-            setUsers(liveUsers);
+            setUsers(liveUsers); // eslint-disable-line react-hooks/set-state-in-effect
             setLoadingUsers(false);
         }
     }, [liveUsers]);

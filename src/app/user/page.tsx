@@ -6,7 +6,7 @@ import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { PinUploadModal } from "@/components/upload/PinUploadModal";
 import { VisualItem } from "@/types/visualItem";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 type UserProfileDetails = {
@@ -61,7 +61,7 @@ export default function ProfilePage() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        setMounted(true);
+        setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
     }, []);
 
     const loadProfile = async () => {
@@ -109,12 +109,12 @@ export default function ProfilePage() {
     };
 
     useEffect(() => {
-        loadProfile();
+        loadProfile(); // eslint-disable-line react-hooks/set-state-in-effect
     }, []);
 
     useEffect(() => {
         if (profile) {
-            loadTabContent(activeTab);
+            loadTabContent(activeTab); // eslint-disable-line react-hooks/set-state-in-effect
         }
     }, [activeTab, profile?.id]);
 
@@ -347,15 +347,6 @@ export default function ProfilePage() {
             </main>
         );
     }
-
-    const initials = profile.name
-        ? profile.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .slice(0, 2)
-            .toUpperCase()
-        : "CH";
 
     return (
         <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">

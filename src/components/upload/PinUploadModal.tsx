@@ -32,7 +32,7 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
   if (!isOpen || !mounted) return null;
