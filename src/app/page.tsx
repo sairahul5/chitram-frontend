@@ -253,7 +253,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f5f1e9] px-4 py-6 text-[#1f2925] sm:px-8 lg:px-12">
+    <main className="animate-page-in min-h-screen bg-[#f5f1e9] px-4 py-6 text-[#1f2925] sm:px-8 lg:px-12">
       {/* Header */}
       <header className="mx-auto flex max-w-7xl items-center justify-between gap-3">
         <div className="min-w-0 flex items-center gap-6">
