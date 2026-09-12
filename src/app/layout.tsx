@@ -12,7 +12,13 @@ export const metadata: Metadata = {
   title: "Chitram | Visual discovery",
   description: "India's visual discovery platform.",
   icons: {
-    icon: "/icon.png",
+    icon: {
+      url: "/icon.png",
+      type: "image/png",
+      sizes: "6250x6250",
+    },
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 };
 
