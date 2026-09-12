@@ -265,77 +265,77 @@ export function PinCard({
           </div>
           {/* Image menu stays inside the image holder and opens above its button. */}
           <div className="pointer-events-none absolute inset-0 z-20" ref={menuRef}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowMenu(!showMenu);
-            }}
-            type="button"
-            className="pointer-events-auto absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1f2925] shadow-md backdrop-blur-md transition hover:bg-white active:scale-95 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
-            aria-label="More options"
-            aria-expanded={showMenu}
-          >
-            <span className="flex flex-col items-center gap-0.5" aria-hidden="true">
-              <span className="h-1 w-1 rounded-full bg-current" />
-              <span className="h-1 w-1 rounded-full bg-current" />
-              <span className="h-1 w-1 rounded-full bg-current" />
-            </span>
-          </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
+              type="button"
+              className="pointer-events-auto absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-[#1f2925] shadow-md backdrop-blur-md transition hover:bg-white active:scale-95 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+              aria-label="More options"
+              aria-expanded={showMenu}
+            >
+              <span className="flex flex-col items-center gap-0.5" aria-hidden="true">
+                <span className="h-1 w-1 rounded-full bg-current" />
+                <span className="h-1 w-1 rounded-full bg-current" />
+                <span className="h-1 w-1 rounded-full bg-current" />
+              </span>
+            </button>
 
-          {/* Dropdown Menu */}
-          {showMenu && (
-            <div className="pointer-events-auto absolute bottom-14 right-3 z-[100] max-h-[calc(100%_-_24px)] w-48 overflow-y-auto rounded-2xl border border-[#d8ded8] bg-white/95 p-1.5 text-sm font-medium text-[#1f2925] shadow-[0_16px_40px_rgba(31,41,37,0.2)] backdrop-blur-md animate-scale-in">
-              <button
-                onClick={() => { setShowReport(true); setShowMenu(false); }}
-                disabled={!currentUserId || !onReport}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#fff5f2] disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <span>Report</span>
-                <span className="text-xs text-[#a84f37]" aria-hidden="true">!</span>
-              </button>
-              <button
-                onClick={handleCopyLink}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#f5f1e9]"
-              >
-                <span>{copied ? "Link Copied! ✓" : "Copy Link"}</span>
-                <span className="text-xs text-[#68736d]" aria-hidden="true">↗</span>
-              </button>
-              <button
-                onClick={handleDownload}
-                disabled={isDownloading}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#f5f1e9] disabled:cursor-wait disabled:opacity-60"
-              >
-                <span>{isDownloading ? "Downloading..." : "Download Image"}</span>
-                <span>↓</span>
-              </button>
-              {canEdit && (
+            {/* Dropdown Menu */}
+            {showMenu && (
+              <div className="pointer-events-auto absolute bottom-14 right-3 z-[100] max-h-[calc(100%_-_24px)] w-48 overflow-y-auto rounded-2xl border border-[#d8ded8] bg-white/95 p-1.5 text-sm font-medium text-[#1f2925] shadow-[0_16px_40px_rgba(31,41,37,0.2)] backdrop-blur-md animate-scale-in">
                 <button
-                  onClick={() => {
-                    setEditTitle(item.title);
-                    setEditCategory(item.category);
-                    setEditDescription(item.description ?? "");
-                    setEditError(null);
-                    setShowEdit(true);
-                    setShowMenu(false);
-                  }}
-                  className="mt-1 flex w-full items-center justify-between border-t border-[#f0eee6] px-3 py-2.5 text-left transition hover:bg-[#f5f1e9]"
+                  onClick={() => { setShowReport(true); setShowMenu(false); }}
+                  disabled={!currentUserId || !onReport}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#fff5f2] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <span>Edit details</span>
-                  <span className="text-xs text-[#68736d]" aria-hidden="true">Edit</span>
+                  <span>Report</span>
+                  <span className="text-xs text-[#a84f37]" aria-hidden="true">!</span>
                 </button>
-              )}
-              {canDelete && (
                 <button
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="mt-1 flex w-full items-center justify-between border-t border-[#f0eee6] px-3 py-2.5 text-left text-[#d2643b] transition hover:bg-[#fff0ed] disabled:cursor-wait disabled:opacity-50"
+                  onClick={handleCopyLink}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#f5f1e9]"
                 >
-                  <span>{isDeleting ? "Deleting..." : "Delete Pin"}</span>
-                  <span className="text-xs" aria-hidden="true">Delete</span>
+                  <span>{copied ? "Link Copied! ✓" : "Copy Link"}</span>
+                  <span className="text-xs text-[#68736d]" aria-hidden="true">↗</span>
                 </button>
-              )}
-            </div>
-          )}
+                <button
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition hover:bg-[#f5f1e9] disabled:cursor-wait disabled:opacity-60"
+                >
+                  <span>{isDownloading ? "Downloading..." : "Download Image"}</span>
+                  <span>↓</span>
+                </button>
+                {canEdit && (
+                  <button
+                    onClick={() => {
+                      setEditTitle(item.title);
+                      setEditCategory(item.category);
+                      setEditDescription(item.description ?? "");
+                      setEditError(null);
+                      setShowEdit(true);
+                      setShowMenu(false);
+                    }}
+                    className="mt-1 flex w-full items-center justify-between border-t border-[#f0eee6] px-3 py-2.5 text-left transition hover:bg-[#f5f1e9]"
+                  >
+                    <span>Edit details</span>
+                    <span className="text-xs text-[#68736d]" aria-hidden="true">Edit</span>
+                  </button>
+                )}
+                {canDelete && (
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="mt-1 flex w-full items-center justify-between border-t border-[#f0eee6] px-3 py-2.5 text-left text-[#d2643b] transition hover:bg-[#fff0ed] disabled:cursor-wait disabled:opacity-50"
+                  >
+                    <span>{isDeleting ? "Deleting..." : "Delete Pin"}</span>
+                    <span className="text-xs" aria-hidden="true">Delete</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -69,14 +69,6 @@ export default function ProfilePage() {
             const data = await apiClient<UserProfileDetails>("/user/profile");
             setProfile(data);
             setNotSignedIn(false);
-            apiClient<VisualItem[]>("/user/saved")
-                .then(setSavedPins)
-                .catch((err) => console.error("Failed to load saved pins:", err));
-            if (data.isAdmin) {
-                apiClient<VisualItem[]>("/user/all-creations")
-                    .then(setAllCreations)
-                    .catch((err) => console.error("Failed to preload all creations:", err));
-            }
         } catch {
             setNotSignedIn(true);
         } finally {
@@ -91,6 +83,9 @@ export default function ProfilePage() {
             if (tab === "all-creations") {
                 const list = await apiClient<VisualItem[]>("/user/all-creations");
                 setAllCreations(list);
+            } else if (tab === "saved") {
+                const list = await apiClient<VisualItem[]>("/user/saved");
+                setSavedPins(list);
             } else if (tab === "creators") {
                 const list = await apiClient<UserSummary[]>("/user/creators");
                 setCreators(list);

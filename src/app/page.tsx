@@ -50,13 +50,13 @@ export default function Home() {
   const [recommendationsEnabled, setRecommendationsEnabled] = useState(true);
 
   // Initial feed load
-  const loadFeed = useCallback(async (query: string = "", personalized = false) => {
+  const loadFeed = useCallback(async (query: string = "", personalized = false, signal?: AbortSignal) => {
     setLoadingItems(true);
     setError(false);
     try {
       if (personalized && currentUser) {
         try {
-          const recommendations = await apiClient<VisualItem[]>("/recommendations?limit=25");
+          const recommendations = await apiClient<VisualItem[]>("/recommendations?limit=25", { signal });
           if (recommendations?.length) {
             setItems(recommendations);
             setNextCursor(null);
@@ -69,14 +69,14 @@ export default function Home() {
       }
 
       const q = query.trim() ? `&query=${encodeURIComponent(query.trim())}` : "";
-      const data = await apiClient<VisualFeedResponse>(`/visual-items/feed?limit=25${q}`);
+      const data = await apiClient<VisualFeedResponse>(`/visual-items/feed?limit=25${q}`, { signal });
       setItems(data.items || []);
       setNextCursor(data.nextCursor);
       setHasMore(data.hasMore);
     } catch {
-      setError(true);
+      if (!signal?.aborted) setError(true);
     } finally {
-      setLoadingItems(false);
+      if (!signal?.aborted) setLoadingItems(false);
     }
   }, [currentUser]);
 
@@ -107,19 +107,28 @@ export default function Home() {
 
   useEffect(() => {
     const accountQuery = searchQuery.trim().replace(/^@/, "");
-    if (accountQuery) {
-      apiClient<AccountSearchResult[]>(`/user/search?query=${encodeURIComponent(accountQuery)}`)
-        .then(setAccountResults)
-        .catch(() => setAccountResults([]));
-    }
+    const controller = new AbortController();
     const feedLoad = window.setTimeout(() => {
+      if (accountQuery.length >= 2) {
+        apiClient<AccountSearchResult[]>(`/user/search?query=${encodeURIComponent(accountQuery)}`, { signal: controller.signal })
+          .then(setAccountResults)
+          .catch(() => {
+            if (!controller.signal.aborted) setAccountResults([]);
+          });
+      } else {
+        setAccountResults([]);
+      }
       void loadFeed(
         selectedCategory === "All" ? searchQuery : selectedCategory,
-        Boolean(recommendationsEnabled && currentUser && selectedCategory === "All" && !searchQuery.trim())
+        Boolean(recommendationsEnabled && currentUser && selectedCategory === "All" && !searchQuery.trim()),
+        controller.signal,
       );
-    }, 0);
+    }, 250);
 
-    return () => window.clearTimeout(feedLoad);
+    return () => {
+      window.clearTimeout(feedLoad);
+      controller.abort();
+    };
   }, [selectedCategory, searchQuery, currentUser, recommendationsEnabled, loadFeed]);
 
   useEffect(() => {

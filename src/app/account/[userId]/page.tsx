@@ -174,13 +174,13 @@ export default function PublicAccountPage() {
                                         <span aria-hidden="true">↗</span>
                                     </button>
                                     {currentUser && !isOwnProfile && (
-                                    <button
-                                        onClick={() => { setShowReport(true); setShowMenu(false); }}
-                                        className="flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-[#fff5f2]"
-                                    >
-                                        <span>Report account</span>
-                                        <span>⚑</span>
-                                    </button>
+                                        <button
+                                            onClick={() => { setShowReport(true); setShowMenu(false); }}
+                                            className="flex w-full items-center justify-between px-4 py-2 text-left transition hover:bg-[#fff5f2]"
+                                        >
+                                            <span>Report account</span>
+                                            <span>⚑</span>
+                                        </button>
                                     )}
                                 </div>
                             )}

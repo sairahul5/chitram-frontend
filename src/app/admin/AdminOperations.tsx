@@ -206,30 +206,30 @@ export default function AdminOperations() {
                 </div>
             </section>
             <div className="flex flex-col gap-6">
-            <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
-                <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Platform settings</h2><p className="mt-1 text-sm text-[#68736d]">Small operational switches for the early platform.</p></div>
-                <div className="divide-y divide-[#e8ece8]">{[["registration_enabled", "Registration"], ["image_uploads_enabled", "Image uploads"], ["public_profiles_enabled", "Public profiles"]].map(([key, label]) => <div key={key} className="flex items-center justify-between px-6 py-4"><span className="text-sm font-medium">{label}</span><div className="checkbox-wrapper-35"><input checked={Boolean(platformSettings[key])} id={`platform-${key}`} name={`platform-${key}`} onChange={(event) => void togglePlatformSetting(key, event.target.checked)} type="checkbox" className="switch" /><label htmlFor={`platform-${key}`}><span className="switch-x-text"> </span><span className="switch-x-toggletext"><span className="switch-x-unchecked"><span className="switch-x-hiddenlabel">Unchecked: </span>OFF</span><span className="switch-x-checked"><span className="switch-x-hiddenlabel">Checked: </span>ON</span></span></label></div></div>)}</div>
-            </section>
-            <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
-                <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Admin activity</h2><p className="mt-1 text-sm text-[#68736d]">Recent administrative changes.</p></div>
-                <div className="divide-y divide-[#e8ece8]">{activity.slice(0, 8).map((entry) => <div key={`${entry.action}-${entry.occurredAt}`} className="px-6 py-3"><p className="text-sm font-semibold">{entry.action}</p><p className="text-xs text-[#68736d]">{entry.target ?? "Platform"} · {entry.occurredAt}</p></div>)}{activity.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No admin activity yet.</p>}</div>
-            </section>
-            <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
-                <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Session duration</h2><p className="mt-1 text-sm text-[#68736d]">Controls how long users remain signed in before they need to authenticate again.</p></div>
-                <div className="px-6 py-5">
-                    {sessionDurationDays === null ? (
-                        <p className="text-sm text-[#68736d]">Loading current session duration...</p>
-                    ) : (
-                        <select value={sessionDurationDays} disabled={savingSessionDuration} onChange={(event) => void updateSessionDuration(Number(event.target.value))} className="w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm disabled:opacity-60">
-                            <option value={7}>7 days</option>
-                            <option value={30}>30 days</option>
-                            <option value={90}>90 days</option>
-                            <option value={365}>1 year</option>
-                        </select>
-                    )}
-                    <p className="mt-2 text-xs text-[#68736d]">New sign-ins use this value. Existing sessions keep their current expiry.</p>
-                </div>
-            </section>
+                <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
+                    <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Platform settings</h2><p className="mt-1 text-sm text-[#68736d]">Small operational switches for the early platform.</p></div>
+                    <div className="divide-y divide-[#e8ece8]">{[["registration_enabled", "Registration"], ["image_uploads_enabled", "Image uploads"], ["public_profiles_enabled", "Public profiles"]].map(([key, label]) => <div key={key} className="flex items-center justify-between px-6 py-4"><span className="text-sm font-medium">{label}</span><div className="checkbox-wrapper-35"><input checked={Boolean(platformSettings[key])} id={`platform-${key}`} name={`platform-${key}`} onChange={(event) => void togglePlatformSetting(key, event.target.checked)} type="checkbox" className="switch" /><label htmlFor={`platform-${key}`}><span className="switch-x-text"> </span><span className="switch-x-toggletext"><span className="switch-x-unchecked"><span className="switch-x-hiddenlabel">Unchecked: </span>OFF</span><span className="switch-x-checked"><span className="switch-x-hiddenlabel">Checked: </span>ON</span></span></label></div></div>)}</div>
+                </section>
+                <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
+                    <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Admin activity</h2><p className="mt-1 text-sm text-[#68736d]">Recent administrative changes.</p></div>
+                    <div className="divide-y divide-[#e8ece8]">{activity.slice(0, 8).map((entry) => <div key={`${entry.action}-${entry.occurredAt}`} className="px-6 py-3"><p className="text-sm font-semibold">{entry.action}</p><p className="text-xs text-[#68736d]">{entry.target ?? "Platform"} · {entry.occurredAt}</p></div>)}{activity.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No admin activity yet.</p>}</div>
+                </section>
+                <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
+                    <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Session duration</h2><p className="mt-1 text-sm text-[#68736d]">Controls how long users remain signed in before they need to authenticate again.</p></div>
+                    <div className="px-6 py-5">
+                        {sessionDurationDays === null ? (
+                            <p className="text-sm text-[#68736d]">Loading current session duration...</p>
+                        ) : (
+                            <select value={sessionDurationDays} disabled={savingSessionDuration} onChange={(event) => void updateSessionDuration(Number(event.target.value))} className="w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm disabled:opacity-60">
+                                <option value={7}>7 days</option>
+                                <option value={30}>30 days</option>
+                                <option value={90}>90 days</option>
+                                <option value={365}>1 year</option>
+                            </select>
+                        )}
+                        <p className="mt-2 text-xs text-[#68736d]">New sign-ins use this value. Existing sessions keep their current expiry.</p>
+                    </div>
+                </section>
             </div>
         </div>
     );
