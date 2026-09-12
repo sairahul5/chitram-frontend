@@ -381,12 +381,26 @@ export function PinCard({
             type="button"
             onClick={handleLikeToggle}
             disabled={!currentUserId || !onLikeToggle || isLiking}
-            className={`shrink-0 text-xs font-semibold transition ${liked ? "text-[#d2643b]" : "text-[#68736d] hover:text-[#d2643b]"} disabled:cursor-not-allowed disabled:opacity-60`}
+            className={`flex h-8 min-w-[3.25rem] shrink-0 items-center justify-center gap-1 rounded-full px-2 text-xs font-semibold transition hover:bg-[#fff0ed] active:scale-95 ${liked ? "text-[#d2643b]" : "text-[#68736d] hover:text-[#d2643b]"} disabled:cursor-not-allowed disabled:opacity-60`}
             aria-label={liked ? "Unlike post" : "Like post"}
+            aria-pressed={liked}
             title={!currentUserId ? "Sign in to like this post" : undefined}
           >
-            <span className="text-base leading-none" aria-hidden="true">{liked ? "♥" : "♡"}</span>
-            <span className="ml-1">{likeCount}</span>
+            <svg
+              viewBox="0 0 24 24"
+              className="h-[18px] w-[18px]"
+              aria-hidden="true"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"
+                fill={liked ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>{likeCount}</span>
           </button>
         </div>
         {likeError && <p className="mt-1 text-right text-[10px] font-medium text-[#a84f37]">{likeError}</p>}
