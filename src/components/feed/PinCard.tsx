@@ -3,6 +3,7 @@
 import { VisualItem } from "@/types/visualItem";
 import { Avatar } from "@/components/ui/Avatar";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 
 interface PinCardProps {
   item: VisualItem;
@@ -13,6 +14,8 @@ interface PinCardProps {
   isOwnerFeed?: boolean;
   initiallySaved?: boolean;
   onSaveToggle?: (id: number, shouldSave: boolean) => Promise<void>;
+  onView?: (id: number) => void;
+  onLikeToggle?: (id: number, shouldLike: boolean) => Promise<{ liked: boolean; likeCount: number }>;
 }
 
 export function PinCard({
@@ -24,6 +27,8 @@ export function PinCard({
   isOwnerFeed = false,
   initiallySaved = false,
   onSaveToggle,
+  onView,
+  onLikeToggle,
 }: PinCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -32,6 +37,10 @@ export function PinCard({
   const [copied, setCopied] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [liked, setLiked] = useState(item.likedByCurrentUser ?? false);
+  const [likeCount, setLikeCount] = useState(item.likeCount ?? 0);
+  const [isLiking, setIsLiking] = useState(false);
+  const [likeError, setLikeError] = useState<string | null>(null);
   const [showEdit, setShowEdit] = useState(false);
   const [editTitle, setEditTitle] = useState(item.title);
   const [editCategory, setEditCategory] = useState(item.category);
@@ -126,6 +135,30 @@ export function PinCard({
     }
   };
 
+  const handleLikeToggle = async () => {
+    if (!currentUserId || !onLikeToggle || isLiking) return;
+
+    const nextLiked = !liked;
+    const previousLiked = liked;
+    const previousCount = likeCount;
+    setLikeError(null);
+    setLiked(nextLiked);
+    setLikeCount(Math.max(0, previousCount + (nextLiked ? 1 : -1)));
+    setIsLiking(true);
+
+    try {
+      const result = await onLikeToggle(item.id, nextLiked);
+      setLiked(result.liked);
+      setLikeCount(result.likeCount);
+    } catch {
+      setLiked(previousLiked);
+      setLikeCount(previousCount);
+      setLikeError("Could not update like");
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
   return (
     <div className="group mb-3 break-inside-avoid sm:mb-5">
       {/* Visual Image Container with reserved aspect ratio */}
@@ -145,7 +178,10 @@ export function PinCard({
             alt={item.title || "Chitram post"}
             loading="lazy"
             decoding="async"
-            onLoad={() => setIsLoaded(true)}
+            onLoad={() => {
+              setIsLoaded(true);
+              onView?.(item.id);
+            }}
             className={`w-full h-full object-cover transition-all duration-500 ease-out ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
               }`}
           />
@@ -313,24 +349,47 @@ export function PinCard({
         )}
 
         {/* Creator Info */}
-        <div className="mt-2 flex items-center gap-2">
-          <Avatar
-            src={item.creatorPictureUrl}
-            name={item.creatorName || "Chitram Creator"}
-            size="xs"
-            className="border border-[#e8ece8]"
-          />
-          <div className="flex items-center gap-1 min-w-0 text-xs text-[#68736d]">
-            <span className="font-semibold text-[#1f2925] truncate">
-              {item.creatorName || "Chitram Creator"}
-            </span>
-            {item.creatorUsername && (
-              <span className="text-[#d2643b] font-medium truncate">
-                @{item.creatorUsername}
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <Avatar
+              src={item.creatorPictureUrl}
+              name={item.creatorName || "Chitram Creator"}
+              size="xs"
+              className="border border-[#e8ece8]"
+            />
+            <div className="flex min-w-0 items-center gap-1 text-xs text-[#68736d]">
+              <span className="truncate font-semibold text-[#1f2925]">
+                {item.creatorName || "Chitram Creator"}
               </span>
-            )}
+              {item.creatorUsername && (
+                item.uploadedBy ? (
+                  <Link
+                    href={`/account/${item.uploadedBy}`}
+                    className="truncate font-medium text-[#d2643b] hover:underline"
+                  >
+                    @{item.creatorUsername}
+                  </Link>
+                ) : (
+                  <span className="truncate font-medium text-[#d2643b]">
+                    @{item.creatorUsername}
+                  </span>
+                )
+              )}
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={handleLikeToggle}
+            disabled={!currentUserId || !onLikeToggle || isLiking}
+            className={`shrink-0 text-xs font-semibold transition ${liked ? "text-[#d2643b]" : "text-[#68736d] hover:text-[#d2643b]"} disabled:cursor-not-allowed disabled:opacity-60`}
+            aria-label={liked ? "Unlike post" : "Like post"}
+            title={!currentUserId ? "Sign in to like this post" : undefined}
+          >
+            <span className="text-base leading-none" aria-hidden="true">{liked ? "♥" : "♡"}</span>
+            <span className="ml-1">{likeCount}</span>
+          </button>
         </div>
+        {likeError && <p className="mt-1 text-right text-[10px] font-medium text-[#a84f37]">{likeError}</p>}
       </div>
     </div>
   );

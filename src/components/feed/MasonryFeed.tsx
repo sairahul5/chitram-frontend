@@ -17,6 +17,8 @@ interface MasonryFeedProps {
   isOwnerFeed?: boolean;
   savedPinIds?: number[];
   onSaveToggle?: (id: number, shouldSave: boolean) => Promise<void>;
+  onView?: (id: number) => void;
+  onLikeToggle?: (id: number, shouldLike: boolean) => Promise<{ liked: boolean; likeCount: number }>;
   emptyTitle?: string;
   emptySubtitle?: string;
 }
@@ -36,6 +38,8 @@ export function MasonryFeed({
   isOwnerFeed = false,
   savedPinIds = [],
   onSaveToggle,
+  onView,
+  onLikeToggle,
   emptyTitle = "No posts discovered yet",
   emptySubtitle = "Check back soon or publish your own visual creation!",
 }: MasonryFeedProps) {
@@ -116,6 +120,8 @@ export function MasonryFeed({
             isOwnerFeed={isOwnerFeed}
             initiallySaved={savedPinIds.includes(item.id)}
             onSaveToggle={onSaveToggle}
+            onView={onView}
+            onLikeToggle={onLikeToggle}
           />
         ))}
       </div>

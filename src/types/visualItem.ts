@@ -15,6 +15,8 @@ export interface VisualItem {
   creatorName?: string | null;
   creatorUsername?: string | null;
   creatorPictureUrl?: string | null;
+  likeCount?: number;
+  likedByCurrentUser?: boolean;
 }
 
 export interface VisualFeedResponse {

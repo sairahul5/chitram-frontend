@@ -5,6 +5,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { PinUploadModal } from "@/components/upload/PinUploadModal";
 import { VisualItem, VisualFeedResponse } from "@/types/visualItem";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 
@@ -44,10 +45,18 @@ export default function Home() {
   const [savedPinIds, setSavedPinIds] = useState<number[]>([]);
 
   // Initial feed load
-  const loadFeed = useCallback(async (query: string = "") => {
+  const loadFeed = useCallback(async (query: string = "", personalized = false) => {
     setLoadingItems(true);
     setError(false);
     try {
+      if (personalized && currentUser) {
+        const recommendations = await apiClient<VisualItem[]>("/recommendations?limit=25");
+        setItems(recommendations || []);
+        setNextCursor(null);
+        setHasMore(false);
+        return;
+      }
+
       const q = query.trim() ? `&query=${encodeURIComponent(query.trim())}` : "";
       const data = await apiClient<VisualFeedResponse>(`/visual-items/feed?limit=25${q}`);
       setItems(data.items || []);
@@ -58,7 +67,7 @@ export default function Home() {
     } finally {
       setLoadingItems(false);
     }
-  }, []);
+  }, [currentUser]);
 
   // Infinite scroll load more
   const handleLoadMore = async () => {
@@ -85,11 +94,16 @@ export default function Home() {
       apiClient<AccountSearchResult[]>(`/user/search?query=${encodeURIComponent(accountQuery)}`)
         .then(setAccountResults)
         .catch(() => setAccountResults([]));
-    } else {
-      setAccountResults([]);
     }
-    loadFeed(selectedCategory === "All" ? searchQuery : selectedCategory);
-  }, [selectedCategory, searchQuery, loadFeed]);
+    const feedLoad = window.setTimeout(() => {
+      void loadFeed(
+        selectedCategory === "All" ? searchQuery : selectedCategory,
+        Boolean(currentUser && selectedCategory === "All" && !searchQuery.trim())
+      );
+    }, 0);
+
+    return () => window.clearTimeout(feedLoad);
+  }, [selectedCategory, searchQuery, currentUser, loadFeed]);
 
   useEffect(() => {
     apiClient<{ id: number; name: string; email: string; pictureUrl?: string | null; username?: string | null; isAdmin?: boolean }>("/user/profile")
@@ -121,6 +135,31 @@ export default function Home() {
     setSavedPinIds((prev) =>
       shouldSave ? (prev.includes(id) ? prev : [...prev, id]) : prev.filter((savedId) => savedId !== id)
     );
+  };
+
+  const handlePinView = (id: number) => {
+    if (!currentUser) return;
+    apiClient("/recommendations/interactions", {
+      method: "POST",
+      body: JSON.stringify({ pinId: id, type: "VIEW" }),
+    }).catch(() => undefined);
+  };
+
+  const handleLikeToggle = async (id: number, shouldLike: boolean) => {
+    const result = await apiClient<{ liked: boolean; likeCount: number }>(`/pins/${id}/like`, {
+      method: shouldLike ? "POST" : "DELETE",
+    });
+    setItems((prev) => prev.map((item) => item.id === id
+      ? { ...item, likeCount: result.likeCount, likedByCurrentUser: result.liked }
+      : item));
+    return result;
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    if (!value.trim().replace(/^@/, "")) {
+      setAccountResults([]);
+    }
   };
 
   const handleLogout = async () => {
@@ -160,7 +199,14 @@ export default function Home() {
       <header className="mx-auto flex max-w-7xl items-center justify-between gap-3">
         <div className="min-w-0 flex items-center gap-6">
           <Link className="shrink-0 hover:opacity-90 transition" href="/" aria-label="Chitram home">
-            <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
+            <Image
+              src="/name.png"
+              alt="Chitram"
+              width={176}
+              height={48}
+              priority
+              className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44"
+            />
           </Link>
         </div>
 
@@ -168,7 +214,7 @@ export default function Home() {
           <input
             type="search"
             value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
+            onChange={(event) => handleSearchChange(event.target.value)}
             placeholder="Search posts or accounts"
             className="w-full rounded-2xl border border-[#d8ded8] bg-white px-4 py-2.5 text-sm text-[#1f2925] shadow-sm outline-none transition placeholder:text-[#98a39c] focus:border-[#d2643b]"
             aria-label="Search posts or accounts"
@@ -225,7 +271,7 @@ export default function Home() {
             <input
               type="search"
               value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
+              onChange={(event) => handleSearchChange(event.target.value)}
               placeholder="Search posts or accounts"
               className="w-full rounded-2xl border border-[#d8ded8] bg-white px-4 py-3 text-sm text-[#1f2925] shadow-sm outline-none transition placeholder:text-[#98a39c] focus:border-[#d2643b]"
               aria-label="Search posts or accounts"
@@ -240,7 +286,7 @@ export default function Home() {
               key={cat}
               onClick={() => {
                 setSelectedCategory(cat);
-                setSearchQuery("");
+                handleSearchChange("");
               }}
               className={`rounded-full px-4 py-2 text-xs sm:text-sm font-semibold transition active:scale-95 whitespace-nowrap shadow-sm ${selectedCategory === cat
                 ? "bg-[#1f2925] text-white"
@@ -297,6 +343,8 @@ export default function Home() {
           onEditPin={handleEditPin}
           savedPinIds={savedPinIds}
           onSaveToggle={handleSaveToggle}
+          onView={handlePinView}
+          onLikeToggle={handleLikeToggle}
           emptyTitle={selectedCategory === "All" ? "No posts available yet" : `No posts in ${selectedCategory}`}
           emptySubtitle="Be the first to share an image in this category!"
         />

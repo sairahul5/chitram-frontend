@@ -35,7 +35,13 @@ export default function PublicAccountPage() {
     }, [params.userId]);
 
     if (loading) {
-        return <main className="min-h-screen bg-[#f5f1e9] p-8 text-[#1f2925]">Loading account...</main>;
+        return (
+            <main className="relative flex min-h-screen items-center justify-center bg-[#f5f1e9] text-[#1f2925]" aria-label="Loading account">
+                <div className="spinner" aria-hidden="true">
+                    {Array.from({ length: 10 }, (_, index) => <div key={index} />)}
+                </div>
+            </main>
+        );
     }
 
     if (notFound || !profile) {
