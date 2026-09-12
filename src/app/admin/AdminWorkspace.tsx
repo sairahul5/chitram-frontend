@@ -336,14 +336,24 @@ function PanelView({
                     <h2 className="font-semibold">Personalized recommendations</h2>
                     <p className="mt-1 text-sm text-[#68736d]">When disabled, the home page uses the normal chronological feed.</p>
                 </div>
-                <button
-                    type="button"
-                    disabled={savingRecommendationSetting}
-                    onClick={() => void onRecommendationsEnabledChange(!recommendationsEnabled)}
-                    className={`rounded-full px-4 py-2 text-sm font-semibold text-white transition disabled:cursor-wait disabled:opacity-60 ${recommendationsEnabled ? "bg-[#438268]" : "bg-[#68736d]"}`}
-                >
-                    {savingRecommendationSetting ? "Saving..." : recommendationsEnabled ? "Enabled" : "Disabled"}
-                </button>
+                <div className="checkbox-wrapper-35">
+                    <input
+                        checked={recommendationsEnabled}
+                        disabled={savingRecommendationSetting}
+                        id="recommendations-switch"
+                        name="recommendations-switch"
+                        onChange={(event) => void onRecommendationsEnabledChange(event.target.checked)}
+                        type="checkbox"
+                        className="switch"
+                    />
+                    <label htmlFor="recommendations-switch">
+                        <span className="switch-x-text">Recommendations </span>
+                        <span className="switch-x-toggletext">
+                            <span className="switch-x-unchecked"><span className="switch-x-hiddenlabel">Unchecked: </span>Disable</span>
+                            <span className="switch-x-checked"><span className="switch-x-hiddenlabel">Checked: </span>Enable</span>
+                        </span>
+                    </label>
+                </div>
             </section>
             <section className="mt-6 overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                 <div className="flex items-center justify-between border-b border-[#e8ece8] px-6 py-5">
