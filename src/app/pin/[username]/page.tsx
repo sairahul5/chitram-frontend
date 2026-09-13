@@ -7,16 +7,16 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function PinPage() {
-    const params = useParams<{ id: string }>();
+    const params = useParams<{ username: string }>();
     const [item, setItem] = useState<VisualItem | null>(null);
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
-        if (!params.id) return;
-        apiClient<VisualItem>(`/visual-items/${encodeURIComponent(params.id)}`)
+        if (!params.username) return;
+        apiClient<VisualItem>(`/visual-items/${encodeURIComponent(params.username)}`)
             .then(setItem)
             .catch(() => setNotFound(true));
-    }, [params.id]);
+    }, [params.username]);
 
     if (notFound) {
         return (

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { apiClient } from "@/lib/apiClient";
 import { VisualItem } from "@/types/visualItem";
+import { DEFAULT_CATEGORY_NAMES } from "@/lib/categories";
 
 interface PinUploadModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
   const [mounted, setMounted] = useState(false);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Photography");
+  const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORY_NAMES);
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -34,6 +36,14 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
   useEffect(() => {
     setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    apiClient<string[]>("/categories").then((loadedCategories) => {
+      setCategories(loadedCategories);
+      setCategory((current) => loadedCategories.includes(current) ? current : loadedCategories[0] ?? "General");
+    }).catch(() => setCategories(DEFAULT_CATEGORY_NAMES));
+  }, [isOpen]);
 
   if (!isOpen || !mounted) return null;
 
@@ -317,13 +327,7 @@ export function PinUploadModal({ isOpen, onClose, onSuccess }: PinUploadModalPro
                 disabled={isUploading}
                 className="mt-1.5 w-full rounded-2xl border border-[#d8ded8] bg-[#fafaf7] px-4 py-2.5 text-sm text-[#1f2925] outline-none focus:border-[#1f2925] focus:bg-white transition"
               >
-                <option value="Photography">Photography</option>
-                <option value="Travel">Travel</option>
-                <option value="Architecture">Architecture</option>
-                <option value="Nature">Nature</option>
-                <option value="Art & Design">Art & Design</option>
-                <option value="Lifestyle">Lifestyle</option>
-                <option value="Culture">Culture</option>
+                {categories.map((categoryOption) => <option key={categoryOption} value={categoryOption}>{categoryOption}</option>)}
               </select>
             </div>
           </div>

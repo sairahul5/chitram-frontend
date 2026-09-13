@@ -13,6 +13,7 @@ import {
     WsAdminUser,
     WsVisualItem,
     AdminActivity,
+    AdminOperationsSnapshot,
 } from "@/hooks/useAdminWebSocket";
 
 type View = "home" | "panel";
@@ -62,6 +63,7 @@ export default function AdminWorkspace() {
     const [savedPinIds, setSavedPinIds] = useState<number[]>([]);
     const [requiresLogin, setRequiresLogin] = useState(false);
     const [liveUsers, setLiveUsers] = useState<AdminUser[] | null>(null);
+    const [liveOperations, setLiveOperations] = useState<AdminOperationsSnapshot | null>(null);
     const [recommendationsEnabled, setRecommendationsEnabled] = useState(true);
     const [savingRecommendationSetting, setSavingRecommendationSetting] = useState(false);
     const [dbOverview, setDbOverview] = useState<DatabaseOverview | null>(null);
@@ -127,11 +129,16 @@ export default function AdminWorkspace() {
         setImages((prev) => prev.filter((p) => p.id !== id));
     }, []);
 
+    const handleOperationsUpdate = useCallback((operations: AdminOperationsSnapshot) => {
+        setLiveOperations(operations);
+    }, []);
+
     const wsStatus = useAdminWebSocket({
         onDashboardUpdate: handleDashboardUpdate,
         onUsersUpdate: handleUsersUpdate,
         onNewImage: handleNewImage,
         onImageDeleted: handleImageDeleted,
+        onOperationsUpdate: handleOperationsUpdate,
     });
 
     // ── Admin actions ───────────────────────────────────────────────────────
@@ -224,6 +231,7 @@ export default function AdminWorkspace() {
                             }
                         }}
                         dbOverview={dbOverview}
+                        liveOperations={liveOperations}
                     />
                 ) : (
                     <>
@@ -287,6 +295,7 @@ function PanelView({
     savingRecommendationSetting,
     onRecommendationsEnabledChange,
     dbOverview,
+    liveOperations,
 }: {
     dashboard: AdminDashboard | null;
     error: string | null;
@@ -298,6 +307,7 @@ function PanelView({
     savingRecommendationSetting: boolean;
     onRecommendationsEnabledChange: (enabled: boolean) => Promise<void>;
     dbOverview: DatabaseOverview | null;
+    liveOperations: AdminOperationsSnapshot | null;
 }) {
     if (error) {
         return (
@@ -461,7 +471,7 @@ function PanelView({
                 </div>
             </section>
             <AdminUsers liveUsers={liveUsers} />
-            <AdminOperations />
+            <AdminOperations liveOperations={liveOperations} />
         </div>
     );
 }

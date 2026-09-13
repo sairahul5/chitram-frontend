@@ -2,13 +2,14 @@
 
 import { apiClient } from "@/lib/apiClient";
 import { useEffect, useState } from "react";
+import type { AdminOperationsSnapshot } from "@/hooks/useAdminWebSocket";
 
 type Category = { id: number; name: string; description: string | null; enabled: boolean };
 type Report = { id: number; targetType: string; targetId: number; reportedBy: string; reason: string; description: string | null; status: string; createdAt: string };
 type Pin = { id: number; title: string; category: string };
 type Activity = { action: string; target: string | null; occurredAt: string };
 
-export default function AdminOperations() {
+export default function AdminOperations({ liveOperations }: { liveOperations?: AdminOperationsSnapshot | null }) {
     const [categories, setCategories] = useState<Category[]>([]);
     const [reports, setReports] = useState<Report[]>([]);
     const [pins, setPins] = useState<Pin[]>([]);
@@ -20,6 +21,13 @@ export default function AdminOperations() {
     const [categoryError, setCategoryError] = useState<string | null>(null);
     const [reportFilter, setReportFilter] = useState<string>("ALL");
     const [reportTargetFilter, setReportTargetFilter] = useState<string>("ALL");
+
+    const displayedCategories = liveOperations?.categories ?? categories;
+    const displayedReports = liveOperations?.reports ?? reports;
+    const displayedPins = liveOperations?.pins.slice(0, 12) ?? pins;
+    const displayedPlatformSettings = liveOperations?.platformSettings ?? platformSettings;
+    const displayedActivity = liveOperations?.activity ?? activity;
+    const displayedSessionDurationDays = liveOperations?.sessionDurationDays ?? sessionDurationDays;
 
     async function load() {
         const [loadedCategories, loadedReports, loadedPins, loadedSettings, loadedActivity, loadedSession] = await Promise.all([
@@ -107,7 +115,7 @@ export default function AdminOperations() {
         }
     }
 
-    const filteredReports = reports.filter((report) => {
+    const filteredReports = displayedReports.filter((report) => {
         const statusMatch = reportFilter === "ALL" || report.status === reportFilter;
         const targetMatch = reportTargetFilter === "ALL" || report.targetType === reportTargetFilter;
         return statusMatch && targetMatch;
@@ -136,13 +144,13 @@ export default function AdminOperations() {
                 </div>
                 {categoryError && <p className="px-6 py-3 text-sm text-[#a84f37]">{categoryError}</p>}
                 <div className="divide-y divide-[#e8ece8]">
-                    {categories.map((category) => (
+                    {displayedCategories.map((category) => (
                         <div key={category.id} className="flex items-center justify-between px-6 py-4">
                             <span className="text-sm font-medium">{category.name}</span>
                             <button type="button" onClick={() => void toggleCategory(category)} className={`rounded-full px-3 py-1 text-xs font-semibold ${category.enabled ? "bg-[#e9eee8] text-[#438268]" : "bg-[#f2ece8] text-[#a84f37]"}`}>{category.enabled ? "Enabled" : "Disabled"}</button>
                         </div>
                     ))}
-                    {categories.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No categories created yet.</p>}
+                    {displayedCategories.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No categories created yet.</p>}
                 </div>
             </section>
             <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
@@ -201,26 +209,26 @@ export default function AdminOperations() {
             <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white xl:col-span-2">
                 <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Pin moderation</h2><p className="mt-1 text-sm text-[#68736d]">Approve, reject, or hide uploaded pins.</p></div>
                 <div className="divide-y divide-[#e8ece8]">
-                    {pins.map((pin) => <div key={pin.id} className="flex items-center justify-between gap-4 px-6 py-4"><div><p className="text-sm font-semibold">{pin.title}</p><p className="text-xs text-[#68736d]">#{pin.id} · {pin.category}</p></div><div className="flex gap-2"><button type="button" onClick={() => void setModerationStatus(pin.id, "APPROVED")} className="rounded-full bg-[#e9eee8] px-3 py-1 text-xs font-semibold text-[#438268]">Approve</button><button type="button" onClick={() => void setModerationStatus(pin.id, "REJECTED")} className="rounded-full bg-[#fff5f2] px-3 py-1 text-xs font-semibold text-[#a84f37]">Reject</button><button type="button" onClick={() => void setModerationStatus(pin.id, "HIDDEN")} className="rounded-full border border-[#d8ded8] px-3 py-1 text-xs font-semibold">Hide</button></div></div>)}
-                    {pins.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No pins available.</p>}
+                    {displayedPins.map((pin) => <div key={pin.id} className="flex items-center justify-between gap-4 px-6 py-4"><div><p className="text-sm font-semibold">{pin.title}</p><p className="text-xs text-[#68736d]">#{pin.id} · {pin.category}</p></div><div className="flex gap-2"><button type="button" onClick={() => void setModerationStatus(pin.id, "APPROVED")} className="rounded-full bg-[#e9eee8] px-3 py-1 text-xs font-semibold text-[#438268]">Approve</button><button type="button" onClick={() => void setModerationStatus(pin.id, "REJECTED")} className="rounded-full bg-[#fff5f2] px-3 py-1 text-xs font-semibold text-[#a84f37]">Reject</button><button type="button" onClick={() => void setModerationStatus(pin.id, "HIDDEN")} className="rounded-full border border-[#d8ded8] px-3 py-1 text-xs font-semibold">Hide</button></div></div>)}
+                    {displayedPins.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No pins available.</p>}
                 </div>
             </section>
             <div className="flex flex-col gap-6">
                 <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                     <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Platform settings</h2><p className="mt-1 text-sm text-[#68736d]">Small operational switches for the early platform.</p></div>
-                    <div className="divide-y divide-[#e8ece8]">{[["registration_enabled", "Registration"], ["image_uploads_enabled", "Image uploads"], ["public_profiles_enabled", "Public profiles"]].map(([key, label]) => <div key={key} className="flex items-center justify-between px-6 py-4"><span className="text-sm font-medium">{label}</span><div className="checkbox-wrapper-35"><input checked={Boolean(platformSettings[key])} id={`platform-${key}`} name={`platform-${key}`} onChange={(event) => void togglePlatformSetting(key, event.target.checked)} type="checkbox" className="switch" /><label htmlFor={`platform-${key}`}><span className="switch-x-text"> </span><span className="switch-x-toggletext"><span className="switch-x-unchecked"><span className="switch-x-hiddenlabel">Unchecked: </span>OFF</span><span className="switch-x-checked"><span className="switch-x-hiddenlabel">Checked: </span>ON</span></span></label></div></div>)}</div>
+                    <div className="divide-y divide-[#e8ece8]">{[["registration_enabled", "Registration"], ["image_uploads_enabled", "Image uploads"], ["public_profiles_enabled", "Public profiles"]].map(([key, label]) => <div key={key} className="flex items-center justify-between px-6 py-4"><span className="text-sm font-medium">{label}</span><div className="checkbox-wrapper-35"><input checked={Boolean(displayedPlatformSettings[key])} id={`platform-${key}`} name={`platform-${key}`} onChange={(event) => void togglePlatformSetting(key, event.target.checked)} type="checkbox" className="switch" /><label htmlFor={`platform-${key}`}><span className="switch-x-text"> </span><span className="switch-x-toggletext"><span className="switch-x-unchecked"><span className="switch-x-hiddenlabel">Unchecked: </span>OFF</span><span className="switch-x-checked"><span className="switch-x-hiddenlabel">Checked: </span>ON</span></span></label></div></div>)}</div>
                 </section>
                 <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                     <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Admin activity</h2><p className="mt-1 text-sm text-[#68736d]">Recent administrative changes.</p></div>
-                    <div className="divide-y divide-[#e8ece8]">{activity.slice(0, 8).map((entry) => <div key={`${entry.action}-${entry.occurredAt}`} className="px-6 py-3"><p className="text-sm font-semibold">{entry.action}</p><p className="text-xs text-[#68736d]">{entry.target ?? "Platform"} · {entry.occurredAt}</p></div>)}{activity.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No admin activity yet.</p>}</div>
+                    <div className="divide-y divide-[#e8ece8]">{displayedActivity.slice(0, 8).map((entry) => <div key={`${entry.action}-${entry.occurredAt}`} className="px-6 py-3"><p className="text-sm font-semibold">{entry.action}</p><p className="text-xs text-[#68736d]">{entry.target ?? "Platform"} · {entry.occurredAt}</p></div>)}{displayedActivity.length === 0 && <p className="px-6 py-5 text-sm text-[#68736d]">No admin activity yet.</p>}</div>
                 </section>
                 <section className="overflow-hidden rounded-3xl border border-[#d8ded8] bg-white">
                     <div className="border-b border-[#e8ece8] px-6 py-5"><h2 className="font-semibold">Session duration</h2><p className="mt-1 text-sm text-[#68736d]">Controls how long users remain signed in before they need to authenticate again.</p></div>
                     <div className="px-6 py-5">
-                        {sessionDurationDays === null ? (
+                        {displayedSessionDurationDays === null ? (
                             <p className="text-sm text-[#68736d]">Loading current session duration...</p>
                         ) : (
-                            <select value={sessionDurationDays} disabled={savingSessionDuration} onChange={(event) => void updateSessionDuration(Number(event.target.value))} className="w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm disabled:opacity-60">
+                            <select value={displayedSessionDurationDays} disabled={savingSessionDuration} onChange={(event) => void updateSessionDuration(Number(event.target.value))} className="w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm disabled:opacity-60">
                                 <option value={7}>7 days</option>
                                 <option value={30}>30 days</option>
                                 <option value={90}>90 days</option>

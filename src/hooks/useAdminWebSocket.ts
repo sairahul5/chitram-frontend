@@ -11,6 +11,14 @@ export type WsAdminMetric = { label: string; value: number };
 export type WsAdminTable = { name: string; rows: number; status: string };
 export type WsAdminDashboard = { metrics: WsAdminMetric[]; tables: WsAdminTable[]; recentActivity?: AdminActivity[] };
 export type AdminActivity = { action: string; target: string; occurredAt: string };
+export type AdminOperationsSnapshot = {
+    categories: { id: number; name: string; description: string | null; enabled: boolean }[];
+    reports: { id: number; targetType: string; targetId: number; reportedBy: string; reason: string; description: string | null; status: string; createdAt: string }[];
+    pins: { id: number; title: string; category: string }[];
+    platformSettings: Record<string, boolean>;
+    activity: AdminActivity[];
+    sessionDurationDays: number;
+};
 
 export type WsAdminUser = {
     id: number;
@@ -50,6 +58,7 @@ export interface AdminWebSocketHandlers {
     onUsersUpdate?: (users: WsAdminUser[]) => void;
     onNewImage?: (item: WsVisualItem) => void;
     onImageDeleted?: (id: number) => void;
+    onOperationsUpdate?: (operations: AdminOperationsSnapshot) => void;
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -110,6 +119,15 @@ export function useAdminWebSocket(handlers: AdminWebSocketHandlers): ConnectionS
                         try {
                             const id: number = JSON.parse(msg.body);
                             handlersRef.current.onImageDeleted?.(id);
+                        } catch { /* malformed message — ignore */ }
+                    })
+                );
+
+                subs.push(
+                    client.subscribe("/topic/admin/operations", (msg: IMessage) => {
+                        try {
+                            const data: AdminOperationsSnapshot = JSON.parse(msg.body);
+                            handlersRef.current.onOperationsUpdate?.(data);
                         } catch { /* malformed message — ignore */ }
                     })
                 );

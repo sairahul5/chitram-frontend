@@ -5,6 +5,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
 import { PinUploadModal } from "@/components/upload/PinUploadModal";
 import { VisualItem } from "@/types/visualItem";
+import { ProfileLayout } from "@/components/profile/ProfileLayout";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -344,147 +345,42 @@ export default function ProfilePage() {
     }
 
     return (
-        <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">
-            {/* Top Navigation Bar */}
-            <header className="sticky top-0 z-20 border-b border-[#e4dcd3] bg-[#f5f1e9]/90 backdrop-blur-md">
-                <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:flex-nowrap sm:px-6 sm:py-4 lg:px-10">
-                    <div className="flex min-w-0 items-center gap-3 sm:gap-6">
-                        <Link href="/" className="shrink-0" aria-label="Chitram home">
-                            <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
-                        </Link>
-                        <span className="hidden rounded-full bg-[#fbebe4] px-3 py-1 text-xs font-semibold uppercase tracking-wider text-[#d2643b] sm:inline-block">
-                            Creator Profile
-                        </span>
-                    </div>
-                    <div className="order-3 flex w-full items-center gap-2 sm:order-2 sm:w-auto sm:gap-3">
-                        {profile.isAdmin && (
-                            <Link
-                                href="/admin"
-                                className="flex-1 rounded-full bg-[#1f2925] px-3 py-2 text-center text-xs font-semibold text-white hover:bg-[#2e3b36] transition shadow-sm sm:flex-none sm:px-4 sm:text-sm"
-                            >
-                                Admin Panel
-                            </Link>
-                        )}
-                        <Link
-                            href="/"
-                            className="flex-1 rounded-full border border-[#d8ded8] px-3 py-2 text-center text-xs font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition sm:flex-none sm:px-4 sm:text-sm"
-                        >
-                            Gallery
-                        </Link>
-                        <button
-                            onClick={handleSignOut}
-                            className="flex-1 rounded-full border border-[#d8ded8] px-3 py-2 text-center text-xs font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition sm:flex-none sm:px-4 sm:text-sm"
-                            type="button"
-                        >
-                            Sign out
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-12 animate-fade-in">
-                {/* Profile Hero Card */}
-                <section className="relative overflow-hidden rounded-3xl border border-[#e4dcd3] bg-white p-4 sm:p-8 shadow-[0_16px_50px_rgba(31,41,37,0.06)]">
-                    {/* Top row: Avatar + Info on left, Buttons on right */}
-                    <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-                        {/* Avatar & User Info */}
-                        <div className="flex min-w-0 items-start gap-3 sm:gap-5">
-                            <div className="shrink-0">
-                                <Avatar
-                                    src={profile.pictureUrl}
-                                    name={profile.name}
-                                    size="xl"
-                                />
-                            </div>
-                            <div className="min-w-0 pt-1">
-                                <div className="flex flex-wrap items-center gap-2">
-                                    <h1 className="text-xl font-bold tracking-tight text-[#1f2925] sm:text-2xl leading-tight">
-                                        {profile.name}
-                                    </h1>
-                                    {profile.isAdmin ? (
-                                        <span className="shrink-0 rounded-full bg-[#d2643b] px-2.5 py-0.5 text-xs font-semibold text-white">
-                                            Admin
-                                        </span>
-                                    ) : (
-                                        <span className="shrink-0 rounded-full bg-[#edf3ee] px-2.5 py-0.5 text-xs font-semibold text-[#3b795c]">
-                                            Verified
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                                    {profile.username ? (
-                                        <span className="inline-flex items-center leading-none rounded-full bg-[#fbebe4] px-2.5 py-0.5 text-xs font-semibold text-[#d2643b]">
-                                            @{profile.username}
-                                        </span>
-                                    ) : (
-                                        <button
-                                            onClick={openEditProfile}
-                                            className="inline-flex items-center leading-none rounded-full border border-dashed border-[#d2643b] bg-[#fbebe4]/60 px-2.5 py-0.5 text-xs font-medium text-[#d2643b] hover:bg-[#fbebe4] active:scale-95 transition"
-                                        >
-                                            + Set username
-                                        </button>
-                                    )}
-                                    <span className="text-[#c4cec7] text-xs leading-none">•</span>
-                                    <span className="truncate text-xs text-[#68736d]">{profile.email}</span>
-                                </div>
-                                <p className="mt-2 text-xs font-medium text-[#98a39c]">
-                                    Cloud media stored on Supabase Storage
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Action buttons — stacked on mobile, row on sm+ */}
-                        <div className="flex w-full shrink-0 items-center justify-end gap-2 sm:mt-1 sm:w-auto">
-                            <button
-                                onClick={openEditProfile}
-                                className="inline-flex items-center gap-1.5 rounded-full border border-[#d8ded8] bg-white px-3.5 py-2 text-sm font-semibold text-[#1f2925] hover:bg-[#fafaf7] hover:border-[#1f2925] active:scale-95 transition shadow-sm"
-                            >
-                                <svg className="h-3.5 w-3.5 text-[#68736d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                                <span className="hidden sm:inline">Edit profile</span>
-                                <span className="sm:hidden">Edit</span>
-                            </button>
-                            <button
-                                onClick={() => setShowUpload(!showUpload)}
-                                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold shadow-sm active:scale-95 transition duration-200 ${showUpload
-                                    ? "bg-[#fbebe4] text-[#d2643b] border border-[#f5c7b3]"
-                                    : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
-                                    }`}
-                            >
-                                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                </svg>
-                                <span className="hidden sm:inline">{showUpload ? "Close studio" : "Share a creation"}</span>
-                                <span className="sm:hidden">{showUpload ? "Close" : "Upload"}</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Stats bar */}
-                    <div className="mt-6 flex items-center gap-0 border-t border-[#f0eee6] pt-5">
-                        <div className="flex flex-1 flex-col items-center gap-0.5 text-center">
-                            <span className="text-xl font-bold text-[#1f2925] tabular-nums">{profile.creationsCount}</span>
-                            <span className="text-[10px] uppercase tracking-wider text-[#68736d]">Creations</span>
-                        </div>
-                        <div className="h-8 w-px bg-[#e4dcd3]" />
-                        <button
-                            onClick={() => setActiveTab("followers")}
-                            className="flex flex-1 flex-col items-center gap-0.5 text-center hover:opacity-70 active:scale-95 transition"
-                        >
-                            <span className="text-xl font-bold text-[#1f2925] tabular-nums">{profile.followersCount}</span>
-                            <span className="text-[10px] uppercase tracking-wider text-[#68736d]">Followers</span>
-                        </button>
-                        <div className="h-8 w-px bg-[#e4dcd3]" />
-                        <button
-                            onClick={() => setActiveTab("following")}
-                            className="flex flex-1 flex-col items-center gap-0.5 text-center hover:opacity-70 active:scale-95 transition"
-                        >
-                            <span className="text-xl font-bold text-[#1f2925] tabular-nums">{profile.followingCount}</span>
-                            <span className="text-[10px] uppercase tracking-wider text-[#68736d]">Following</span>
-                        </button>
-                    </div>
-                </section>
+        <ProfileLayout
+            profile={profile}
+            topActions={
+                <>
+                    {profile.isAdmin && <Link href="/admin" className="rounded-full bg-[#1f2925] px-3 py-2 text-center text-xs font-semibold text-white transition hover:bg-[#2e3b36] sm:px-4 sm:text-sm">Admin Panel</Link>}
+                    <Link href="/" className="rounded-full border border-[#d8ded8] px-3 py-2 text-center text-xs font-semibold text-[#68736d] transition hover:border-[#1f2925] hover:text-[#1f2925] sm:px-4 sm:text-sm">Gallery</Link>
+                    <button onClick={handleSignOut} className="rounded-full border border-[#d8ded8] px-3 py-2 text-center text-xs font-semibold text-[#68736d] transition hover:border-[#1f2925] hover:text-[#1f2925] sm:px-4 sm:text-sm" type="button">Sign out</button>
+                </>
+            }
+            profileActions={
+                <>
+                    <button onClick={openEditProfile} className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full border border-[#d8ded8] bg-white px-3.5 py-2 text-sm font-semibold text-[#1f2925] shadow-sm transition hover:border-[#1f2925] hover:bg-[#fafaf7] sm:flex-none">
+                        <span aria-hidden="true">✎</span><span>Edit profile</span>
+                    </button>
+                    <button onClick={() => setShowUpload(!showUpload)} className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold shadow-sm transition active:scale-95 sm:flex-none ${showUpload ? "border border-[#f5c7b3] bg-[#fbebe4] text-[#d2643b]" : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"}`}>
+                        <span aria-hidden="true">＋</span><span>{showUpload ? "Close studio" : "Share a creation"}</span>
+                    </button>
+                </>
+            }
+            usernameFallback={
+                <button onClick={openEditProfile} className="inline-flex rounded-full border border-dashed border-[#d2643b] bg-[#fbebe4]/60 px-2.5 py-1 text-xs font-medium text-[#d2643b] transition hover:bg-[#fbebe4]">+ Set username</button>
+            }
+            description="Cloud media stored on Supabase Storage"
+            onFollowersClick={() => setActiveTab("followers")}
+            onFollowingClick={() => setActiveTab("following")}
+            tabs={
+                <>
+                    <ProfileTab active={activeTab === "creations"} onClick={() => setActiveTab("creations")}>My Creations ({profile.creationsCount})</ProfileTab>
+                    <ProfileTab active={activeTab === "saved"} onClick={() => setActiveTab("saved")}>Saved Pins ({savedPins.length})</ProfileTab>
+                    {profile.isAdmin && <ProfileTab active={activeTab === "all-creations"} onClick={() => setActiveTab("all-creations")}>All Platform Creations ({allCreations.length})</ProfileTab>}
+                    <ProfileTab active={activeTab === "creators"} onClick={() => setActiveTab("creators")}>Discover Creators</ProfileTab>
+                    <ProfileTab active={activeTab === "followers"} onClick={() => setActiveTab("followers")}>Followers ({profile.followersCount})</ProfileTab>
+                    <ProfileTab active={activeTab === "following"} onClick={() => setActiveTab("following")}>Following ({profile.followingCount})</ProfileTab>
+                </>
+            }
+        >
 
                 {/* Edit Profile Modal */}
                 {showEditProfile && mounted && createPortal(
@@ -644,74 +540,8 @@ export default function ProfilePage() {
                     }}
                 />
 
-                {/* Profile Tabs */}
-                <nav className="mt-8 flex border-b border-[#e4dcd3] gap-1 overflow-x-auto scrollbar-none -mx-1 px-1">
-                    <button
-                        onClick={() => setActiveTab("creations")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "creations" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                            }`}
-                    >
-                        My Creations ({profile.creationsCount})
-                        {activeTab === "creations" && (
-                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1f2925] rounded-full" />
-                        )}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("saved")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "saved" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                            }`}
-                    >
-                        Saved Pins ({savedPins.length})
-                        {activeTab === "saved" && (
-                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1f2925] rounded-full" />
-                        )}
-                    </button>
-                    {profile.isAdmin && (
-                        <button
-                            onClick={() => setActiveTab("all-creations")}
-                            className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "all-creations" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                                }`}
-                        >
-                            All Platform Creations ({allCreations.length})
-                            {activeTab === "all-creations" && (
-                                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1f2925] rounded-full" />
-                            )}
-                        </button>
-                    )}
-                    <button
-                        onClick={() => setActiveTab("creators")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "creators" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                            }`}
-                    >
-                        Discover Creators
-                        {activeTab === "creators" && (
-                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1f2925] rounded-full" />
-                        )}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("followers")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "followers" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                            }`}
-                    >
-                        Followers ({profile.followersCount})
-                        {activeTab === "followers" && (
-                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1f2925] rounded-full" />
-                        )}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab("following")}
-                        className={`relative px-3 pb-3.5 pt-1 text-sm font-semibold whitespace-nowrap transition duration-150 ${activeTab === "following" ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"
-                            }`}
-                    >
-                        Following ({profile.followingCount})
-                        {activeTab === "following" && (
-                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1f2925] rounded-full" />
-                        )}
-                    </button>
-                </nav>
-
                 {/* Tab Content */}
-                <div className="mt-8">
+                <div>
                     {/* Tab 1: Creations */}
                     {activeTab === "creations" && (
                         <div className="animate-fade-in">
@@ -970,7 +800,15 @@ export default function ProfilePage() {
                         </div>
                     )}
                 </div>
-            </div>
-        </main>
+        </ProfileLayout>
+    );
+}
+
+function ProfileTab({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+    return (
+        <button type="button" onClick={onClick} className={`relative shrink-0 whitespace-nowrap px-3 pb-3.5 pt-1 text-sm font-semibold transition ${active ? "text-[#1f2925]" : "text-[#68736d] hover:text-[#1f2925]"}`}>
+            {children}
+            {active && <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-[#1f2925]" />}
+        </button>
     );
 }

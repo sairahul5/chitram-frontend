@@ -5,6 +5,8 @@ import { Avatar } from "@/components/ui/Avatar";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
+import { apiClient } from "@/lib/apiClient";
+import { DEFAULT_CATEGORY_NAMES } from "@/lib/categories";
 
 interface PinCardProps {
   item: VisualItem;
@@ -54,12 +56,18 @@ export function PinCard({
   const [editTitle, setEditTitle] = useState(item.title);
   const hasTrackedView = useRef(false);
   const [editCategory, setEditCategory] = useState(item.category);
+  const [categoryOptions, setCategoryOptions] = useState<string[]>(DEFAULT_CATEGORY_NAMES);
   const [editDescription, setEditDescription] = useState(item.description ?? "");
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!showEdit) return;
+    apiClient<string[]>("/categories").then(setCategoryOptions).catch(() => setCategoryOptions(DEFAULT_CATEGORY_NAMES));
+  }, [showEdit]);
 
   // Calculate precise aspect ratio to eliminate layout shifts (CLS = 0)
   const ratio = item.aspectRatio
@@ -413,7 +421,7 @@ export function PinCard({
           </div>
           <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} required maxLength={120} className="mt-3 w-full rounded-xl border border-[#d8ded8] px-3 py-2 text-sm outline-none focus:border-[#1f2925]" placeholder="Post title" />
           <select value={editCategory} onChange={(e) => setEditCategory(e.target.value)} className="mt-2 w-full rounded-xl border border-[#d8ded8] bg-white px-3 py-2 text-sm outline-none focus:border-[#1f2925]">
-            {['Photography', 'Travel', 'Architecture', 'Nature', 'Art & Design', 'Lifestyle', 'Culture'].map((category) => <option key={category}>{category}</option>)}
+            {[...new Set([editCategory, ...categoryOptions])].map((category) => <option key={category}>{category}</option>)}
           </select>
           <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} maxLength={500} rows={2} className="mt-2 w-full resize-none rounded-xl border border-[#d8ded8] px-3 py-2 text-sm outline-none focus:border-[#1f2925]" placeholder="Description (optional)" />
           {editError && <p className="mt-2 text-xs font-medium text-[#a84f37]">{editError}</p>}

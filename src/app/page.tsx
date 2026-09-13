@@ -9,8 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
-const CATEGORIES = ["All", "Photography", "Travel", "Architecture", "Nature", "Art & Design", "Culture"];
+import { DEFAULT_CATEGORY_NAMES } from "@/lib/categories";
 
 type AccountSearchResult = {
   id: number;
@@ -32,6 +31,7 @@ export default function Home() {
   const [error, setError] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categories, setCategories] = useState<string[]>(["All", ...DEFAULT_CATEGORY_NAMES]);
   const [searchQuery, setSearchQuery] = useState("");
   const [accountResults, setAccountResults] = useState<AccountSearchResult[]>([]);
 
@@ -98,6 +98,12 @@ export default function Home() {
       setLoadingMore(false);
     }
   };
+
+  useEffect(() => {
+    apiClient<string[]>("/categories")
+      .then((loadedCategories) => setCategories(["All", ...loadedCategories]))
+      .catch(() => setCategories(["All", ...DEFAULT_CATEGORY_NAMES]));
+  }, []);
 
   useEffect(() => {
     apiClient<{ enabled: boolean }>("/recommendations/status")
@@ -346,7 +352,7 @@ export default function Home() {
 
         {/* Category Filter Chips */}
         <div className="mt-5 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          {CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => {
