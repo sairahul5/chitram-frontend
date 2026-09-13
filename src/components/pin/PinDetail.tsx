@@ -184,12 +184,12 @@ export function PinDetail({ id }: { id: string }) {
         <Link href="/" aria-label="Chitram home"><img src="/name.png" alt="Chitram" className="h-9 w-32 translate-y-1 object-cover object-center sm:h-11 sm:w-40" /></Link>
       </header>
 
-      <article className="mx-auto mt-5 max-w-7xl animate-fade-in sm:mt-8">
-        <div className="grid items-start gap-5 sm:grid-cols-2 sm:gap-5 lg:grid-cols-5 lg:gap-6 xl:grid-cols-6">
-          <div className="sm:col-span-2 lg:col-span-2">
-            <div className="relative flex w-full items-center justify-center overflow-visible rounded-2xl border border-[#e4dcd3] bg-[#e6e0d6] sm:aspect-[var(--pin-ratio)] sm:max-h-[calc(100vh-18rem)] sm:rounded-3xl" style={{ "--pin-ratio": ratio } as React.CSSProperties}>
+      <article className="mx-auto mt-5 w-full min-w-0 max-w-7xl animate-fade-in sm:mt-8">
+        <div className="grid w-full min-w-0 items-start gap-5 sm:grid-cols-2 sm:gap-5 lg:grid-cols-5 lg:gap-6 xl:grid-cols-6">
+          <div className="w-full min-w-0 sm:col-span-2 lg:col-span-2">
+            <div className="relative flex w-full max-w-full items-center justify-center overflow-visible rounded-2xl border border-[#e4dcd3] bg-[#e6e0d6] sm:aspect-[var(--pin-ratio)] sm:max-h-[calc(100vh-18rem)] sm:rounded-3xl" style={{ "--pin-ratio": ratio } as React.CSSProperties}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.imageUrl} alt={item.title || "Chitram pin"} className="block h-auto w-full rounded-2xl sm:max-h-full sm:max-w-full sm:rounded-3xl sm:object-contain" fetchPriority="high" />
+              <img src={item.imageUrl} alt={item.title || "Chitram pin"} className="block h-auto w-full max-w-full rounded-2xl object-contain sm:max-h-full sm:rounded-3xl" fetchPriority="high" />
               <button type="button" onClick={() => router.back()} className="absolute left-2.5 top-2.5 z-10 rounded-full border border-[#d8ded8] bg-white/95 px-3.5 py-2 text-xs font-semibold shadow-sm hover:bg-white sm:left-4 sm:top-4 sm:px-4 sm:text-sm">Back</button>
               <div className="absolute bottom-2.5 right-2.5 z-10 sm:bottom-4 sm:right-4">
                 <button type="button" onClick={() => setShowMenu((open) => !open)} aria-label="More pin options" aria-expanded={showMenu} className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d8ded8] bg-white/95 text-lg shadow-sm hover:bg-white sm:h-11 sm:w-11">⋮</button>
@@ -216,12 +216,12 @@ export function PinDetail({ id }: { id: string }) {
             </div>
           </div>
 
-          <div className="mt-1 sm:col-span-2 lg:col-span-3 lg:mt-0 xl:col-span-4">
+          <div className="mt-1 w-full min-w-0 sm:col-span-2 lg:col-span-3 lg:mt-0 xl:col-span-4">
             {recommendationsLoading ? (
               <div className="columns-2 gap-4 space-y-4">{[0, 1, 2, 3].map((index) => <div key={`recommendation-skeleton-${index}`} className="mb-4 break-inside-avoid aspect-[4/5] animate-shimmer rounded-2xl bg-[#e4dcd3]" />)}</div>
             ) : (
               <div className="columns-2 gap-2.5 space-y-3 sm:gap-4 sm:space-y-4 lg:columns-3 xl:columns-4">
-                {recommendations.map((recommendation) => <PinCard key={recommendation.id} item={recommendation} currentUserId={session?.id} initiallySaved={false} onSaveToggle={handleSaveRecommendation} onLikeToggle={handleLikeRecommendation} onReport={handleReportRecommendation} />)}
+                {recommendations.map((recommendation) => <PinCard key={recommendation.id} item={recommendation} currentUserId={session?.id} initiallySaved={false} preserveImageAspectRatio onSaveToggle={handleSaveRecommendation} onLikeToggle={handleLikeRecommendation} onReport={handleReportRecommendation} />)}
               </div>
             )}
           </div>

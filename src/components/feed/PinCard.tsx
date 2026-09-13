@@ -20,6 +20,7 @@ interface PinCardProps {
   onView?: (id: number) => void;
   onLikeToggle?: (id: number, shouldLike: boolean) => Promise<{ liked: boolean; likeCount: number }>;
   onReport?: (id: number, reason: string, description: string) => Promise<void>;
+  preserveImageAspectRatio?: boolean;
 }
 
 export function PinCard({
@@ -34,6 +35,7 @@ export function PinCard({
   onView,
   onLikeToggle,
   onReport,
+  preserveImageAspectRatio = false,
 }: PinCardProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -252,8 +254,8 @@ export function PinCard({
       {/* Visual Image Container with reserved aspect ratio */}
       <div className="relative rounded-2xl bg-[#e6e0d6] shadow-sm hover:shadow-[0_16px_36px_rgba(31,41,37,0.12)] transition-all duration-300 transform group-hover:-translate-y-0.5 sm:rounded-3xl">
         <div
-          className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl"
-          style={{ aspectRatio: `${ratio}` }}
+          className={`relative w-full rounded-2xl sm:rounded-3xl ${preserveImageAspectRatio ? "" : "overflow-hidden"}`}
+          style={preserveImageAspectRatio ? undefined : { aspectRatio: `${ratio}` }}
         >
           {/* Shimmer skeleton until image loads */}
           {!isLoaded && (
@@ -263,7 +265,7 @@ export function PinCard({
           <Link
             href={`/pin/${item.id}`}
             aria-label={`Open ${item.title || "Chitram post"}`}
-            className="block h-full w-full"
+            className={`block w-full ${preserveImageAspectRatio ? "" : "h-full"}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -278,7 +280,7 @@ export function PinCard({
                   onView?.(item.id);
                 }
               }}
-              className={`w-full h-full object-cover transition-all duration-500 ease-out ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
+              className={`${preserveImageAspectRatio ? "block h-auto w-full object-contain" : "h-full w-full object-cover"} transition-all duration-500 ease-out ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
                 }`}
             />
           </Link>
