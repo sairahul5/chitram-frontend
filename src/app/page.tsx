@@ -227,15 +227,6 @@ export default function Home() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await apiClient<void>("/auth/logout", { method: "POST" });
-    } catch (e) {
-      console.error(e);
-    }
-    window.location.reload();
-  };
-
   const handleDeletePin = async (id: number) => {
     try {
       await apiClient(`/visual-items/${id}`, { method: "DELETE" });
@@ -262,7 +253,7 @@ export default function Home() {
     <main className="animate-page-in min-h-screen bg-[#f5f1e9] px-4 py-6 text-[#1f2925] sm:px-8 lg:px-12">
       {/* Header */}
       <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 lg:flex-nowrap">
-        <div className="basis-full min-w-0 flex items-center gap-6 lg:basis-auto">
+        <div className="min-w-0 flex items-center gap-3">
           <Link className="shrink-0 hover:opacity-90 transition" href="/" aria-label="Chitram home">
             <Image
               src="/name.png"
@@ -273,6 +264,7 @@ export default function Home() {
               className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44"
             />
           </Link>
+
         </div>
 
         <div className="mx-6 hidden min-w-0 max-w-xl flex-1 lg:block">
@@ -289,10 +281,8 @@ export default function Home() {
           />
         </div>
 
-        <div className="w-full shrink-0 flex items-center justify-end gap-2 sm:gap-3 lg:w-auto">
-          {loadingUser ? (
-            <div className="h-9 w-24 rounded-full bg-[#e5ded4] animate-pulse" />
-          ) : currentUser ? (
+        <div className="shrink-0 flex items-center justify-end gap-2 sm:gap-3">
+          {currentUser ? (
             <>
               <button
                 onClick={() => setShowUploadModal(true)}
@@ -303,23 +293,18 @@ export default function Home() {
                 <span className="hidden sm:inline">+ Create Post</span>
               </button>
 
-              <Link
-                className="flex max-w-[124px] items-center gap-2 rounded-full bg-[#1f2925] pl-1.5 pr-2.5 py-1.5 text-xs font-semibold text-white hover:bg-[#2e3b36] transition shadow-sm sm:max-w-none sm:pr-4 sm:text-sm"
-                href="/user"
-              >
-                <Avatar src={currentUser.pictureUrl} name={currentUser.name} size="sm" />
-                <span className="max-w-[72px] truncate sm:max-w-[160px]">
-                  {currentUser.username ? `@${currentUser.username}` : currentUser.name}
-                </span>
-              </Link>
-
-              <button
-                className="rounded-full border border-[#d2643b] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#a84f37] hover:bg-[#fff5f2] hover:border-[#b85029] hover:text-[#8f402e] transition sm:px-4 sm:py-2 sm:text-sm"
-                onClick={handleLogout}
-                type="button"
-              >
-                Sign out
-              </button>
+              {loadingUser ? (
+                <div className="h-12 w-12 rounded-full bg-[#e5ded4] animate-pulse transition-opacity duration-500" />
+              ) : (
+                <Link
+                  className="flex h-12 w-12 items-center justify-center rounded-full"
+                  href="/user"
+                  aria-label={`Open ${currentUser.username ? `@${currentUser.username}` : currentUser.name} profile`}
+                  title="Open profile"
+                >
+                  <Avatar src={currentUser.pictureUrl} name={currentUser.name} size="md" className="shadow-none" />
+                </Link>
+              )}
             </>
           ) : (
             <Link

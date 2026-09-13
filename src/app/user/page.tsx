@@ -382,424 +382,424 @@ export default function ProfilePage() {
             }
         >
 
-                {/* Edit Profile Modal */}
-                {showEditProfile && mounted && createPortal(
+            {/* Edit Profile Modal */}
+            {showEditProfile && mounted && createPortal(
+                <div
+                    className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in overflow-y-auto"
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget && !savingProfile) {
+                            setShowEditProfile(false);
+                        }
+                    }}
+                >
                     <div
-                        className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in overflow-y-auto"
-                        onClick={(e) => {
-                            if (e.target === e.currentTarget && !savingProfile) {
-                                setShowEditProfile(false);
-                            }
-                        }}
+                        className="relative w-full max-w-lg rounded-3xl border border-[#e4dcd3] bg-white p-6 sm:p-8 shadow-2xl animate-scale-in my-8"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        <div
-                            className="relative w-full max-w-lg rounded-3xl border border-[#e4dcd3] bg-white p-6 sm:p-8 shadow-2xl animate-scale-in my-8"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="flex items-center justify-between border-b border-[#f0eee6] pb-4">
-                                <div>
-                                    <h2 className="text-xl font-bold text-[#1f2925]">Edit Profile</h2>
-                                    <p className="mt-0.5 text-xs text-[#68736d]">Update your display name and unique username handle</p>
-                                </div>
-                                <button
-                                    onClick={() => setShowEditProfile(false)}
-                                    className="flex h-8 w-8 items-center justify-center rounded-full text-[#68736d] hover:bg-[#fafaf7] hover:text-[#1f2925] active:scale-95 transition"
-                                    type="button"
-                                >
-                                    ✕
-                                </button>
+                        <div className="flex items-center justify-between border-b border-[#f0eee6] pb-4">
+                            <div>
+                                <h2 className="text-xl font-bold text-[#1f2925]">Edit Profile</h2>
+                                <p className="mt-0.5 text-xs text-[#68736d]">Update your display name and unique username handle</p>
+                            </div>
+                            <button
+                                onClick={() => setShowEditProfile(false)}
+                                className="flex h-8 w-8 items-center justify-center rounded-full text-[#68736d] hover:bg-[#fafaf7] hover:text-[#1f2925] active:scale-95 transition"
+                                type="button"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSaveProfile} className="mt-6 space-y-5">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-[#68736d]" htmlFor="edit-name">
+                                    Display Name
+                                </label>
+                                <input
+                                    id="edit-name"
+                                    type="text"
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    placeholder="Your full or preferred name"
+                                    maxLength={50}
+                                    required
+                                    className="mt-2 w-full rounded-2xl border border-[#d8ded8] bg-[#fafaf7] px-4 py-3 text-sm text-[#1f2925] outline-none focus:border-[#1f2925] focus:bg-white transition"
+                                />
                             </div>
 
-                            <form onSubmit={handleSaveProfile} className="mt-6 space-y-5">
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-[#68736d]" htmlFor="edit-name">
-                                        Display Name
+                            <div>
+                                <div className="flex items-center justify-between">
+                                    <label className="block text-xs font-bold uppercase tracking-wider text-[#68736d]" htmlFor="edit-username">
+                                        Username Handle
                                     </label>
-                                    <input
-                                        id="edit-name"
-                                        type="text"
-                                        value={editName}
-                                        onChange={(e) => setEditName(e.target.value)}
-                                        placeholder="Your full or preferred name"
-                                        maxLength={50}
-                                        required
-                                        className="mt-2 w-full rounded-2xl border border-[#d8ded8] bg-[#fafaf7] px-4 py-3 text-sm text-[#1f2925] outline-none focus:border-[#1f2925] focus:bg-white transition"
-                                    />
-                                </div>
-
-                                <div>
-                                    <div className="flex items-center justify-between">
-                                        <label className="block text-xs font-bold uppercase tracking-wider text-[#68736d]" htmlFor="edit-username">
-                                            Username Handle
-                                        </label>
-                                        <button
-                                            type="button"
-                                            onClick={fetchSuggestedUsername}
-                                            disabled={suggestingUsername}
-                                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#d2643b] hover:text-[#b85029] active:scale-95 disabled:opacity-50 transition"
-                                        >
-                                            {suggestingUsername ? (
-                                                <>
-                                                    <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
-                                                    <span>Generating...</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span>🎲 Suggest Random</span>
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                    <div className="relative mt-2 flex items-center">
-                                        <span className="absolute left-4 select-none text-sm font-bold text-[#d2643b]">@</span>
-                                        <input
-                                            id="edit-username"
-                                            type="text"
-                                            value={editUsername}
-                                            onChange={(e) => setEditUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
-                                            placeholder="unique_username"
-                                            maxLength={30}
-                                            required
-                                            className="w-full rounded-2xl border border-[#d8ded8] bg-[#fafaf7] pl-8 pr-4 py-3 text-sm font-medium text-[#1f2925] outline-none focus:border-[#1f2925] focus:bg-white transition"
-                                        />
-                                    </div>
-                                    <p className="mt-1.5 text-[11px] text-[#84928a]">
-                                        Letters, numbers, and underscores (3-30 chars). Saved in Supabase.
-                                    </p>
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-[#68736d]">
-                                        Linked Google Account
-                                    </label>
-                                    <input
-                                        type="email"
-                                        value={profile.email}
-                                        disabled
-                                        className="mt-2 w-full rounded-2xl border border-[#e8ece8] bg-[#f5f5f2] px-4 py-2.5 text-sm text-[#84928a] cursor-not-allowed"
-                                    />
-                                    <p className="mt-1 text-[11px] text-[#98a39c]">Authenticated via Google OAuth2</p>
-                                </div>
-
-                                {editError && (
-                                    <div className="rounded-2xl border border-[#e8b9ad] bg-[#fff5f2] p-3.5 text-xs font-medium text-[#a84f37] animate-fade-in">
-                                        {editError}
-                                    </div>
-                                )}
-
-                                {editSuccess && (
-                                    <div className="rounded-2xl border border-[#b7dfc8] bg-[#edf8f1] p-3.5 text-xs font-medium text-[#2c6e49] animate-fade-in">
-                                        {editSuccess}
-                                    </div>
-                                )}
-
-                                <div className="mt-6 flex items-center justify-end gap-3 pt-2">
                                     <button
                                         type="button"
-                                        onClick={() => setShowEditProfile(false)}
-                                        className="rounded-full border border-[#d8ded8] px-5 py-2.5 text-sm font-semibold text-[#68736d] hover:bg-[#fafaf7] active:scale-95 transition"
+                                        onClick={fetchSuggestedUsername}
+                                        disabled={suggestingUsername}
+                                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#d2643b] hover:text-[#b85029] active:scale-95 disabled:opacity-50 transition"
                                     >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        disabled={savingProfile}
-                                        className="inline-flex items-center gap-2 rounded-full bg-[#1f2925] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#2e3b36] active:scale-95 disabled:opacity-50 transition"
-                                    >
-                                        {savingProfile ? (
+                                        {suggestingUsername ? (
                                             <>
-                                                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                                                <span>Saving...</span>
+                                                <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
+                                                <span>Generating...</span>
                                             </>
                                         ) : (
-                                            "Save Changes"
+                                            <>
+                                                <span>🎲 Suggest Random</span>
+                                            </>
                                         )}
                                     </button>
                                 </div>
-                            </form>
-                        </div>
-                    </div>,
-                    document.body
+                                <div className="relative mt-2 flex items-center">
+                                    <span className="absolute left-4 select-none text-sm font-bold text-[#d2643b]">@</span>
+                                    <input
+                                        id="edit-username"
+                                        type="text"
+                                        value={editUsername}
+                                        onChange={(e) => setEditUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                                        placeholder="unique_username"
+                                        maxLength={30}
+                                        required
+                                        className="w-full rounded-2xl border border-[#d8ded8] bg-[#fafaf7] pl-8 pr-4 py-3 text-sm font-medium text-[#1f2925] outline-none focus:border-[#1f2925] focus:bg-white transition"
+                                    />
+                                </div>
+                                <p className="mt-1.5 text-[11px] text-[#84928a]">
+                                    Letters, numbers, and underscores (3-30 chars). Saved in Supabase.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-wider text-[#68736d]">
+                                    Linked Google Account
+                                </label>
+                                <input
+                                    type="email"
+                                    value={profile.email}
+                                    disabled
+                                    className="mt-2 w-full rounded-2xl border border-[#e8ece8] bg-[#f5f5f2] px-4 py-2.5 text-sm text-[#84928a] cursor-not-allowed"
+                                />
+                                <p className="mt-1 text-[11px] text-[#98a39c]">Authenticated via Google OAuth2</p>
+                            </div>
+
+                            {editError && (
+                                <div className="rounded-2xl border border-[#e8b9ad] bg-[#fff5f2] p-3.5 text-xs font-medium text-[#a84f37] animate-fade-in">
+                                    {editError}
+                                </div>
+                            )}
+
+                            {editSuccess && (
+                                <div className="rounded-2xl border border-[#b7dfc8] bg-[#edf8f1] p-3.5 text-xs font-medium text-[#2c6e49] animate-fade-in">
+                                    {editSuccess}
+                                </div>
+                            )}
+
+                            <div className="mt-6 flex items-center justify-end gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEditProfile(false)}
+                                    className="rounded-full border border-[#d8ded8] px-5 py-2.5 text-sm font-semibold text-[#68736d] hover:bg-[#fafaf7] active:scale-95 transition"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={savingProfile}
+                                    className="inline-flex items-center gap-2 rounded-full bg-[#1f2925] px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#2e3b36] active:scale-95 disabled:opacity-50 transition"
+                                >
+                                    {savingProfile ? (
+                                        <>
+                                            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                            <span>Saving...</span>
+                                        </>
+                                    ) : (
+                                        "Save Changes"
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>,
+                document.body
+            )}
+
+            {/* Upload Studio Pin Modal */}
+            <PinUploadModal
+                isOpen={showUpload}
+                onClose={() => setShowUpload(false)}
+                onSuccess={(newPin) => {
+                    setProfile((prev) =>
+                        prev
+                            ? {
+                                ...prev,
+                                creations: [newPin, ...prev.creations],
+                                creationsCount: prev.creationsCount + 1,
+                            }
+                            : null
+                    );
+                    setAllCreations((prev) => [newPin, ...prev]);
+                }}
+            />
+
+            {/* Tab Content */}
+            <div>
+                {/* Tab 1: Creations */}
+                {activeTab === "creations" && (
+                    <div className="animate-fade-in">
+                        <MasonryFeed
+                            items={profile.creations}
+                            currentUserId={profile.id}
+                            isAdmin={profile.isAdmin}
+                            onDeletePin={handleDeletePin}
+                            onEditPin={handleEditPin}
+                            isOwnerFeed
+                            savedPinIds={savedPins.map((pin) => pin.id)}
+                            onSaveToggle={handleSaveToggle}
+                            emptyTitle="No creations published yet"
+                            emptySubtitle="Share your original photography, architecture, or visual art stored directly on Supabase."
+                        />
+                    </div>
                 )}
 
-                {/* Upload Studio Pin Modal */}
-                <PinUploadModal
-                    isOpen={showUpload}
-                    onClose={() => setShowUpload(false)}
-                    onSuccess={(newPin) => {
-                        setProfile((prev) =>
-                            prev
-                                ? {
-                                    ...prev,
-                                    creations: [newPin, ...prev.creations],
-                                    creationsCount: prev.creationsCount + 1,
-                                }
-                                : null
-                        );
-                        setAllCreations((prev) => [newPin, ...prev]);
-                    }}
-                />
+                {/* Saved Pins */}
+                {activeTab === "saved" && (
+                    <div className="animate-fade-in">
+                        <MasonryFeed
+                            items={savedPins}
+                            isLoading={tabLoading}
+                            currentUserId={profile.id}
+                            isAdmin={profile.isAdmin}
+                            onEditPin={handleEditPin}
+                            savedPinIds={savedPins.map((pin) => pin.id)}
+                            onSaveToggle={handleSaveToggle}
+                            emptyTitle="No saved pins yet"
+                            emptySubtitle="Save images from the discovery feed and they will appear here."
+                        />
+                    </div>
+                )}
 
-                {/* Tab Content */}
-                <div>
-                    {/* Tab 1: Creations */}
-                    {activeTab === "creations" && (
-                        <div className="animate-fade-in">
-                            <MasonryFeed
-                                items={profile.creations}
-                                currentUserId={profile.id}
-                                isAdmin={profile.isAdmin}
-                                onDeletePin={handleDeletePin}
-                                onEditPin={handleEditPin}
-                                isOwnerFeed
-                                savedPinIds={savedPins.map((pin) => pin.id)}
-                                onSaveToggle={handleSaveToggle}
-                                emptyTitle="No creations published yet"
-                                emptySubtitle="Share your original photography, architecture, or visual art stored directly on Supabase."
-                            />
-                        </div>
-                    )}
+                {/* Admin Tab: All Platform Creations */}
+                {activeTab === "all-creations" && (
+                    <div className="animate-fade-in">
+                        <MasonryFeed
+                            items={allCreations}
+                            isLoading={tabLoading}
+                            currentUserId={profile.id}
+                            isAdmin={profile.isAdmin}
+                            onDeletePin={handleDeletePin}
+                            onEditPin={handleEditPin}
+                            savedPinIds={savedPins.map((pin) => pin.id)}
+                            onSaveToggle={handleSaveToggle}
+                            emptyTitle="No community creations yet"
+                            emptySubtitle="Creations published across the platform will appear here."
+                        />
+                    </div>
+                )}
 
-                    {/* Saved Pins */}
-                    {activeTab === "saved" && (
-                        <div className="animate-fade-in">
-                            <MasonryFeed
-                                items={savedPins}
-                                isLoading={tabLoading}
-                                currentUserId={profile.id}
-                                isAdmin={profile.isAdmin}
-                                onEditPin={handleEditPin}
-                                savedPinIds={savedPins.map((pin) => pin.id)}
-                                onSaveToggle={handleSaveToggle}
-                                emptyTitle="No saved pins yet"
-                                emptySubtitle="Save images from the discovery feed and they will appear here."
-                            />
-                        </div>
-                    )}
-
-                    {/* Admin Tab: All Platform Creations */}
-                    {activeTab === "all-creations" && (
-                        <div className="animate-fade-in">
-                            <MasonryFeed
-                                items={allCreations}
-                                isLoading={tabLoading}
-                                currentUserId={profile.id}
-                                isAdmin={profile.isAdmin}
-                                onDeletePin={handleDeletePin}
-                                onEditPin={handleEditPin}
-                                savedPinIds={savedPins.map((pin) => pin.id)}
-                                onSaveToggle={handleSaveToggle}
-                                emptyTitle="No community creations yet"
-                                emptySubtitle="Creations published across the platform will appear here."
-                            />
-                        </div>
-                    )}
-
-                    {/* Tab 2: Discover Creators */}
-                    {activeTab === "creators" && (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
-                            {tabLoading ? (
-                                Array.from({ length: 6 }).map((_, i) => (
-                                    <div key={i} className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm">
-                                        <div className="flex items-center gap-3.5">
-                                            <div className="h-12 w-12 rounded-full animate-shimmer" />
-                                            <div className="space-y-2">
-                                                <div className="h-4 w-28 rounded-md animate-shimmer" />
-                                                <div className="h-3 w-16 rounded-md animate-shimmer" />
-                                            </div>
+                {/* Tab 2: Discover Creators */}
+                {activeTab === "creators" && (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
+                        {tabLoading ? (
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="h-12 w-12 rounded-full animate-shimmer" />
+                                        <div className="space-y-2">
+                                            <div className="h-4 w-28 rounded-md animate-shimmer" />
+                                            <div className="h-3 w-16 rounded-md animate-shimmer" />
                                         </div>
-                                        <div className="h-8 w-20 rounded-full animate-shimmer" />
                                     </div>
-                                ))
-                            ) : creators.length === 0 ? (
-                                <p className="col-span-full rounded-3xl border border-[#d8ded8] bg-white p-8 text-center text-sm text-[#68736d] animate-fade-in">
-                                    No other creators registered on Chitram yet.
-                                </p>
-                            ) : (
-                                creators.map((creator) => (
-                                    <div
-                                        key={creator.id}
-                                        className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
-                                    >
-                                        <div className="flex items-center gap-3.5">
-                                            <Avatar
-                                                src={creator.pictureUrl}
-                                                name={creator.name}
-                                                size="md"
-                                                className="border border-[#e8ece8]"
-                                            />
-                                            <div>
-                                                <h3 className="text-sm font-bold text-[#1f2925]">{creator.name}</h3>
-                                                <div className="flex items-center gap-1.5 text-xs text-[#68736d]">
-                                                    {creator.username && <span className="font-semibold text-[#d2643b]">@{creator.username}</span>}
-                                                    {creator.username && <span>•</span>}
-                                                    <span>{creator.followersCount} followers</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button
-                                            disabled={actionLoadingId === creator.id}
-                                            onClick={() => handleFollowToggle(creator.id, creator.following)}
-                                            className={`rounded-full px-4 py-1.5 text-xs font-semibold active:scale-95 transition inline-flex items-center gap-1.5 ${creator.following
-                                                ? "border border-[#d8ded8] text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37]"
-                                                : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
-                                                } ${actionLoadingId === creator.id ? "opacity-70 cursor-not-allowed" : ""}`}
-                                        >
-                                            {actionLoadingId === creator.id ? (
-                                                <>
-                                                    <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
-                                                    <span>Updating...</span>
-                                                </>
-                                            ) : (
-                                                creator.following ? "Following" : "Follow"
-                                            )}
-                                        </button>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    )}
-
-                    {/* Tab 3: Followers */}
-                    {activeTab === "followers" && (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
-                            {tabLoading ? (
-                                Array.from({ length: 6 }).map((_, i) => (
-                                    <div key={i} className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm">
-                                        <div className="flex items-center gap-3.5">
-                                            <div className="h-12 w-12 rounded-full animate-shimmer" />
-                                            <div className="space-y-2">
-                                                <div className="h-4 w-28 rounded-md animate-shimmer" />
-                                                <div className="h-3 w-16 rounded-md animate-shimmer" />
-                                            </div>
-                                        </div>
-                                        <div className="h-8 w-20 rounded-full animate-shimmer" />
-                                    </div>
-                                ))
-                            ) : followers.length === 0 ? (
-                                <div className="col-span-full rounded-3xl border border-dashed border-[#ccd4cd] bg-white/50 p-10 text-center text-[#68736d] animate-fade-in">
-                                    <p className="font-semibold text-[#1f2925]">No followers yet</p>
-                                    <p className="mt-1 text-xs">
-                                        As people discover your creations, they will appear here!
-                                    </p>
+                                    <div className="h-8 w-20 rounded-full animate-shimmer" />
                                 </div>
-                            ) : (
-                                followers.map((follower) => (
-                                    <div
-                                        key={follower.id}
-                                        className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
-                                    >
-                                        <div className="flex items-center gap-3.5">
-                                            <Avatar
-                                                src={follower.pictureUrl}
-                                                name={follower.name}
-                                                size="md"
-                                                className="border border-[#e8ece8]"
-                                            />
-                                            <div>
-                                                <h3 className="text-sm font-bold text-[#1f2925]">{follower.name}</h3>
-                                                <div className="flex items-center gap-1.5 text-xs text-[#68736d]">
-                                                    {follower.username && <span className="font-semibold text-[#d2643b]">@{follower.username}</span>}
-                                                    {follower.username && <span>•</span>}
-                                                    <span>{follower.followersCount} followers</span>
-                                                </div>
+                            ))
+                        ) : creators.length === 0 ? (
+                            <p className="col-span-full rounded-3xl border border-[#d8ded8] bg-white p-8 text-center text-sm text-[#68736d] animate-fade-in">
+                                No other creators registered on Chitram yet.
+                            </p>
+                        ) : (
+                            creators.map((creator) => (
+                                <div
+                                    key={creator.id}
+                                    className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    <div className="flex items-center gap-3.5">
+                                        <Avatar
+                                            src={creator.pictureUrl}
+                                            name={creator.name}
+                                            size="md"
+                                            className="border border-[#e8ece8]"
+                                        />
+                                        <div>
+                                            <h3 className="text-sm font-bold text-[#1f2925]">{creator.name}</h3>
+                                            <div className="flex items-center gap-1.5 text-xs text-[#68736d]">
+                                                {creator.username && <span className="font-semibold text-[#d2643b]">@{creator.username}</span>}
+                                                {creator.username && <span>•</span>}
+                                                <span>{creator.followersCount} followers</span>
                                             </div>
                                         </div>
-                                        <button
-                                            disabled={actionLoadingId === follower.id}
-                                            onClick={() => handleFollowToggle(follower.id, follower.following)}
-                                            className={`rounded-full px-4 py-1.5 text-xs font-semibold active:scale-95 transition inline-flex items-center gap-1.5 ${follower.following
-                                                ? "border border-[#d8ded8] text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37]"
-                                                : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
-                                                } ${actionLoadingId === follower.id ? "opacity-70 cursor-not-allowed" : ""}`}
-                                        >
-                                            {actionLoadingId === follower.id ? (
-                                                <>
-                                                    <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
-                                                    <span>Updating...</span>
-                                                </>
-                                            ) : (
-                                                follower.following ? "Following" : "Follow back"
-                                            )}
-                                        </button>
                                     </div>
-                                ))
-                            )}
-                        </div>
-                    )}
-
-                    {/* Tab 4: Following */}
-                    {activeTab === "following" && (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
-                            {tabLoading ? (
-                                Array.from({ length: 6 }).map((_, i) => (
-                                    <div key={i} className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm">
-                                        <div className="flex items-center gap-3.5">
-                                            <div className="h-12 w-12 rounded-full animate-shimmer" />
-                                            <div className="space-y-2">
-                                                <div className="h-4 w-28 rounded-md animate-shimmer" />
-                                                <div className="h-3 w-16 rounded-md animate-shimmer" />
-                                            </div>
-                                        </div>
-                                        <div className="h-8 w-20 rounded-full animate-shimmer" />
-                                    </div>
-                                ))
-                            ) : followingList.length === 0 ? (
-                                <div className="col-span-full rounded-3xl border border-dashed border-[#ccd4cd] bg-white/50 p-10 text-center text-[#68736d] animate-fade-in">
-                                    <p className="font-semibold text-[#1f2925]">You are not following anyone yet</p>
-                                    <p className="mt-1 text-xs">
-                                        Check out the <strong>Discover Creators</strong> tab to follow visual artists!
-                                    </p>
                                     <button
-                                        onClick={() => setActiveTab("creators")}
-                                        className="mt-4 rounded-full bg-[#1f2925] px-4 py-1.5 text-xs font-semibold text-white active:scale-95 transition"
+                                        disabled={actionLoadingId === creator.id}
+                                        onClick={() => handleFollowToggle(creator.id, creator.following)}
+                                        className={`rounded-full px-4 py-1.5 text-xs font-semibold active:scale-95 transition inline-flex items-center gap-1.5 ${creator.following
+                                            ? "border border-[#d8ded8] text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37]"
+                                            : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
+                                            } ${actionLoadingId === creator.id ? "opacity-70 cursor-not-allowed" : ""}`}
                                     >
-                                        Explore creators
+                                        {actionLoadingId === creator.id ? (
+                                            <>
+                                                <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
+                                                <span>Updating...</span>
+                                            </>
+                                        ) : (
+                                            creator.following ? "Following" : "Follow"
+                                        )}
                                     </button>
                                 </div>
-                            ) : (
-                                followingList.map((user) => (
-                                    <div
-                                        key={user.id}
-                                        className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
-                                    >
-                                        <div className="flex items-center gap-3.5">
-                                            <Avatar
-                                                src={user.pictureUrl}
-                                                name={user.name}
-                                                size="md"
-                                                className="border border-[#e8ece8]"
-                                            />
-                                            <div>
-                                                <h3 className="text-sm font-bold text-[#1f2925]">{user.name}</h3>
-                                                <div className="flex items-center gap-1.5 text-xs text-[#68736d]">
-                                                    {user.username && <span className="font-semibold text-[#d2643b]">@{user.username}</span>}
-                                                    {user.username && <span>•</span>}
-                                                    <span>{user.followersCount} followers</span>
-                                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+
+                {/* Tab 3: Followers */}
+                {activeTab === "followers" && (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
+                        {tabLoading ? (
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="h-12 w-12 rounded-full animate-shimmer" />
+                                        <div className="space-y-2">
+                                            <div className="h-4 w-28 rounded-md animate-shimmer" />
+                                            <div className="h-3 w-16 rounded-md animate-shimmer" />
+                                        </div>
+                                    </div>
+                                    <div className="h-8 w-20 rounded-full animate-shimmer" />
+                                </div>
+                            ))
+                        ) : followers.length === 0 ? (
+                            <div className="col-span-full rounded-3xl border border-dashed border-[#ccd4cd] bg-white/50 p-10 text-center text-[#68736d] animate-fade-in">
+                                <p className="font-semibold text-[#1f2925]">No followers yet</p>
+                                <p className="mt-1 text-xs">
+                                    As people discover your creations, they will appear here!
+                                </p>
+                            </div>
+                        ) : (
+                            followers.map((follower) => (
+                                <div
+                                    key={follower.id}
+                                    className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    <div className="flex items-center gap-3.5">
+                                        <Avatar
+                                            src={follower.pictureUrl}
+                                            name={follower.name}
+                                            size="md"
+                                            className="border border-[#e8ece8]"
+                                        />
+                                        <div>
+                                            <h3 className="text-sm font-bold text-[#1f2925]">{follower.name}</h3>
+                                            <div className="flex items-center gap-1.5 text-xs text-[#68736d]">
+                                                {follower.username && <span className="font-semibold text-[#d2643b]">@{follower.username}</span>}
+                                                {follower.username && <span>•</span>}
+                                                <span>{follower.followersCount} followers</span>
                                             </div>
                                         </div>
-                                        <button
-                                            disabled={actionLoadingId === user.id}
-                                            onClick={() => handleFollowToggle(user.id, true)}
-                                            className={`rounded-full border border-[#d8ded8] px-4 py-1.5 text-xs font-semibold text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37] active:scale-95 transition inline-flex items-center gap-1.5 ${actionLoadingId === user.id ? "opacity-70 cursor-not-allowed" : ""
-                                                }`}
-                                        >
-                                            {actionLoadingId === user.id ? (
-                                                <>
-                                                    <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
-                                                    <span>Updating...</span>
-                                                </>
-                                            ) : (
-                                                "Unfollow"
-                                            )}
-                                        </button>
                                     </div>
-                                ))
-                            )}
-                        </div>
-                    )}
-                </div>
+                                    <button
+                                        disabled={actionLoadingId === follower.id}
+                                        onClick={() => handleFollowToggle(follower.id, follower.following)}
+                                        className={`rounded-full px-4 py-1.5 text-xs font-semibold active:scale-95 transition inline-flex items-center gap-1.5 ${follower.following
+                                            ? "border border-[#d8ded8] text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37]"
+                                            : "bg-[#1f2925] text-white hover:bg-[#2e3b36]"
+                                            } ${actionLoadingId === follower.id ? "opacity-70 cursor-not-allowed" : ""}`}
+                                    >
+                                        {actionLoadingId === follower.id ? (
+                                            <>
+                                                <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
+                                                <span>Updating...</span>
+                                            </>
+                                        ) : (
+                                            follower.following ? "Following" : "Follow back"
+                                        )}
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+
+                {/* Tab 4: Following */}
+                {activeTab === "following" && (
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 animate-fade-in">
+                        {tabLoading ? (
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm">
+                                    <div className="flex items-center gap-3.5">
+                                        <div className="h-12 w-12 rounded-full animate-shimmer" />
+                                        <div className="space-y-2">
+                                            <div className="h-4 w-28 rounded-md animate-shimmer" />
+                                            <div className="h-3 w-16 rounded-md animate-shimmer" />
+                                        </div>
+                                    </div>
+                                    <div className="h-8 w-20 rounded-full animate-shimmer" />
+                                </div>
+                            ))
+                        ) : followingList.length === 0 ? (
+                            <div className="col-span-full rounded-3xl border border-dashed border-[#ccd4cd] bg-white/50 p-10 text-center text-[#68736d] animate-fade-in">
+                                <p className="font-semibold text-[#1f2925]">You are not following anyone yet</p>
+                                <p className="mt-1 text-xs">
+                                    Check out the <strong>Discover Creators</strong> tab to follow visual artists!
+                                </p>
+                                <button
+                                    onClick={() => setActiveTab("creators")}
+                                    className="mt-4 rounded-full bg-[#1f2925] px-4 py-1.5 text-xs font-semibold text-white active:scale-95 transition"
+                                >
+                                    Explore creators
+                                </button>
+                            </div>
+                        ) : (
+                            followingList.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className="flex items-center justify-between rounded-3xl border border-[#e4dcd3] bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                                >
+                                    <div className="flex items-center gap-3.5">
+                                        <Avatar
+                                            src={user.pictureUrl}
+                                            name={user.name}
+                                            size="md"
+                                            className="border border-[#e8ece8]"
+                                        />
+                                        <div>
+                                            <h3 className="text-sm font-bold text-[#1f2925]">{user.name}</h3>
+                                            <div className="flex items-center gap-1.5 text-xs text-[#68736d]">
+                                                {user.username && <span className="font-semibold text-[#d2643b]">@{user.username}</span>}
+                                                {user.username && <span>•</span>}
+                                                <span>{user.followersCount} followers</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button
+                                        disabled={actionLoadingId === user.id}
+                                        onClick={() => handleFollowToggle(user.id, true)}
+                                        className={`rounded-full border border-[#d8ded8] px-4 py-1.5 text-xs font-semibold text-[#68736d] hover:border-[#a84f37] hover:text-[#a84f37] active:scale-95 transition inline-flex items-center gap-1.5 ${actionLoadingId === user.id ? "opacity-70 cursor-not-allowed" : ""
+                                            }`}
+                                    >
+                                        {actionLoadingId === user.id ? (
+                                            <>
+                                                <span className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" />
+                                                <span>Updating...</span>
+                                            </>
+                                        ) : (
+                                            "Unfollow"
+                                        )}
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+            </div>
         </ProfileLayout>
     );
 }
