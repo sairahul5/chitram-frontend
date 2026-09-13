@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-og9p.onrender.com/api").replace(/\/api\/?$/, "");
+const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "/api").replace(/\/api\/?$/, "");
 
 export default function LoginPage() {
     return (

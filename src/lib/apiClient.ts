@@ -1,4 +1,4 @@
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-og9p.onrender.com/api";
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 export async function apiClient<T>(path: string, options?: RequestInit): Promise<T> {
     const url = `${apiUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;

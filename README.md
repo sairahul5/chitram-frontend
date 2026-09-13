@@ -18,7 +18,6 @@ The parent repository tracks `frontend` and `backend` as Git submodules. Commit 
 npm install
 npm run dev
 ```
-
 Open `http://localhost:3000`.
 
 For local development, create `.env.local`:
@@ -27,13 +26,21 @@ For local development, create `.env.local`:
 NEXT_PUBLIC_API_URL=http://localhost:8080/api
 ```
 
-For Vercel, set:
+For Vercel production, set:
 
 ```env
-NEXT_PUBLIC_API_URL=https://chitram-backend-og9p.onrender.com/api
+NEXT_PUBLIC_API_URL=/api
+BACKEND_URL=https://chitram-backend-og9p.onrender.com
 ```
 
-The production fallback also points to the Render backend, but configuring the Vercel variable explicitly is recommended.
+Set these backend production variables:
+
+```env
+FRONTEND_URL=https://chitram-frontend.vercel.app
+GOOGLE_REDIRECT_URI=https://chitram-frontend.vercel.app/login/oauth2/code/google
+```
+
+Register the exact `GOOGLE_REDIRECT_URI` in Google Cloud Console. The OAuth callback and authenticated API requests then stay on the Vercel origin, allowing Safari and mobile browsers to use the secure HTTP-only session cookie without third-party cookie access.
 
 ## Frontend Responsibilities
 
