@@ -260,22 +260,28 @@ export function PinCard({
             <div className="absolute inset-0 bg-[#e4dcd3] animate-shimmer" />
           )}
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={item.imageUrl}
-            alt={item.title || "Chitram post"}
-            loading="lazy"
-            decoding="async"
-            onLoad={() => {
-              setIsLoaded(true);
-              if (!hasTrackedView.current) {
-                hasTrackedView.current = true;
-                onView?.(item.id);
-              }
-            }}
-            className={`w-full h-full object-cover transition-all duration-500 ease-out ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
-              }`}
-          />
+          <Link
+            href={`/pin/${item.id}`}
+            aria-label={`Open ${item.title || "Chitram post"}`}
+            className="block h-full w-full"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={item.imageUrl}
+              alt={item.title || "Chitram post"}
+              loading="lazy"
+              decoding="async"
+              onLoad={() => {
+                setIsLoaded(true);
+                if (!hasTrackedView.current) {
+                  hasTrackedView.current = true;
+                  onView?.(item.id);
+                }
+              }}
+              className={`w-full h-full object-cover transition-all duration-500 ease-out ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"
+                }`}
+            />
+          </Link>
 
           {/* Hover Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
