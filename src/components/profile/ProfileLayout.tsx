@@ -42,18 +42,18 @@ export function ProfileLayout({
     return (
         <main className="min-h-screen overflow-x-hidden bg-[#f5f1e9] text-[#1f2925]">
             <header className="sticky top-0 z-20 border-b border-[#e4dcd3] bg-[#f5f1e9]/90 backdrop-blur-md">
-                <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4 lg:px-10">
-                    <Link href="/" className="shrink-0" aria-label="Chitram home">
+                <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-2 px-3 py-3 sm:flex-nowrap sm:gap-3 sm:px-6 sm:py-4 lg:px-10">
+                    <Link href="/" className="basis-full shrink-0 sm:basis-auto" aria-label="Chitram home">
                         <img src="/name.png" alt="Chitram" className="h-9 w-32 translate-y-1 object-cover object-center sm:h-12 sm:w-44 sm:translate-y-2" />
                     </Link>
-                    <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-3">
+                    <div className="flex w-full min-w-0 items-center justify-end gap-1 sm:w-auto sm:gap-3">
                         {topActions}
                     </div>
                 </div>
             </header>
 
-            <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
-                <section className="rounded-3xl border border-[#e4dcd3] bg-white p-4 shadow-[0_16px_50px_rgba(31,41,37,0.06)] sm:p-8">
+            <div className="mx-auto w-full max-w-7xl px-2.5 py-5 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+                <section className="w-full rounded-3xl border border-[#e4dcd3] bg-white p-3 shadow-[0_16px_50px_rgba(31,41,37,0.06)] sm:p-8">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                         <div className="flex min-w-0 items-start gap-4 sm:gap-5">
                             <Avatar src={profile.pictureUrl} name={profile.name} size="xl" className="shrink-0" />
@@ -93,11 +93,11 @@ export function ProfileLayout({
                     </div>
                 </section>
 
-                <nav className="mt-6 flex gap-1 overflow-x-auto border-b border-[#e4dcd3] px-1 scrollbar-none" aria-label="Profile sections">
+                <nav className="mt-5 flex w-full gap-1 overflow-x-auto border-b border-[#e4dcd3] px-1 scrollbar-none sm:mt-6" aria-label="Profile sections">
                     {tabs}
                 </nav>
 
-                <div className="mt-6 min-w-0">{children}</div>
+                <div className="mt-5 w-full min-w-0 sm:mt-6">{children}</div>
             </div>
         </main>
     );

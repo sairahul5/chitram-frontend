@@ -33,11 +33,11 @@ export default function SharedPinPage() {
 
     return (
         <main className="min-h-screen bg-[#f5f1e9] px-4 py-6 text-[#1f2925] sm:px-8 lg:px-12">
-            <header className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-                <Link className="shrink-0" href="/" aria-label="Chitram home">
+            <header className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 sm:flex-nowrap">
+                <Link className="basis-full shrink-0 sm:basis-auto" href="/" aria-label="Chitram home">
                     <img src="/name.png" alt="Chitram" className="h-11 w-40 translate-y-2 object-cover object-center" />
                 </Link>
-                <Link className="rounded-full border border-[#d8ded8] bg-white px-3 py-2 text-xs font-semibold sm:px-4 sm:text-sm" href="/">Back to posts</Link>
+                <Link className="ml-auto rounded-full border border-[#d8ded8] bg-white px-3 py-2 text-xs font-semibold sm:ml-0 sm:px-4 sm:text-sm" href="/">Back to posts</Link>
             </header>
             <article className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-3xl border border-[#e4dcd3] bg-white shadow-sm">
                 <img src={item.imageUrl} alt={item.title || "Chitram post"} className="max-h-[75vh] w-full object-contain bg-[#e6e0d6]" />

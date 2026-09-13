@@ -194,8 +194,8 @@ function AdminWorkspaceContent() {
     return (
         <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">
             <header className="sticky top-0 z-10 border-b border-[#d8ded8] bg-[#f5f1e9]/95 backdrop-blur">
-                <div className="mx-auto flex max-w-7xl items-center gap-1.5 px-3 py-3 sm:gap-6 sm:px-6 sm:py-4 lg:px-10">
-                    <Link className="shrink-0" href="/" aria-label="Chitram home">
+                <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-1.5 px-3 py-3 sm:flex-nowrap sm:gap-6 sm:px-6 sm:py-4 lg:px-10">
+                    <Link className="basis-full shrink-0 sm:basis-auto" href="/" aria-label="Chitram home">
                         <img src="/name.png" alt="Chitram" className="h-9 w-32 translate-y-1 object-cover object-center sm:h-12 sm:w-44 sm:translate-y-2" />
                     </Link>
                     <nav className="flex min-w-0 flex-1 items-center gap-0.5" aria-label="Admin navigation">

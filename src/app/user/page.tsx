@@ -275,12 +275,12 @@ export default function ProfilePage() {
         return (
             <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">
                 <header className="sticky top-0 z-20 border-b border-[#e4dcd3] bg-[#f5f1e9]/90 backdrop-blur-md">
-                    <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-10">
-                        <div className="flex items-center gap-6">
+                    <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:flex-nowrap sm:px-6 sm:py-4 lg:px-10">
+                        <div className="basis-full flex items-center gap-6 sm:basis-auto">
                             <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
                             <div className="h-5 w-24 rounded-full animate-shimmer" />
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="ml-auto flex items-center gap-3">
                             <div className="h-9 w-20 rounded-full animate-shimmer" />
                             <div className="h-9 w-20 rounded-full animate-shimmer" />
                         </div>

@@ -8,13 +8,13 @@ const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-
 export default function LoginPage() {
     return (
         <main className="flex min-h-screen flex-col bg-[#f5f1e9] text-[#1f2925] selection:bg-[#d2643b]/20">
-            <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-5 sm:px-8 sm:py-6">
-                <Link href="/" className="shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d2643b] hover:opacity-80" aria-label="Chitram home">
+            <header className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-5 sm:flex-nowrap sm:px-8 sm:py-6">
+                <Link href="/" className="basis-full shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#d2643b] hover:opacity-80 sm:basis-auto" aria-label="Chitram home">
                     <Image src="/name.png" alt="Chitram" width={144} height={40} className="h-9 w-32 object-cover object-center sm:h-10 sm:w-36" priority />
                 </Link>
                 <Link
                     href="/"
-                    className="inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-medium text-[#68736d] hover:text-[#1f2925] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d2643b]"
+                    className="ml-auto inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-sm font-medium text-[#68736d] hover:text-[#1f2925] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d2643b]"
                 >
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />

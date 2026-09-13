@@ -261,8 +261,8 @@ export default function Home() {
   return (
     <main className="animate-page-in min-h-screen bg-[#f5f1e9] px-4 py-6 text-[#1f2925] sm:px-8 lg:px-12">
       {/* Header */}
-      <header className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-        <div className="min-w-0 flex items-center gap-6">
+      <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 lg:flex-nowrap">
+        <div className="basis-full min-w-0 flex items-center gap-6 lg:basis-auto">
           <Link className="shrink-0 hover:opacity-90 transition" href="/" aria-label="Chitram home">
             <Image
               src="/name.png"
@@ -289,7 +289,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="shrink-0 flex items-center gap-2 sm:gap-3">
+        <div className="w-full shrink-0 flex items-center justify-end gap-2 sm:gap-3 lg:w-auto">
           {loadingUser ? (
             <div className="h-9 w-24 rounded-full bg-[#e5ded4] animate-pulse" />
           ) : currentUser ? (
