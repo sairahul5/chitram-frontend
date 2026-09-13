@@ -42,11 +42,11 @@ export function ProfileLayout({
     return (
         <main className="min-h-screen overflow-x-hidden bg-[#f5f1e9] text-[#1f2925]">
             <header className="sticky top-0 z-20 border-b border-[#e4dcd3] bg-[#f5f1e9]/90 backdrop-blur-md">
-                <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-10">
+                <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4 lg:px-10">
                     <Link href="/" className="shrink-0" aria-label="Chitram home">
-                        <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
+                        <img src="/name.png" alt="Chitram" className="h-9 w-32 translate-y-1 object-cover object-center sm:h-12 sm:w-44 sm:translate-y-2" />
                     </Link>
-                    <div className="flex min-w-0 items-center justify-end gap-2 sm:gap-3">
+                    <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-3">
                         {topActions}
                     </div>
                 </div>

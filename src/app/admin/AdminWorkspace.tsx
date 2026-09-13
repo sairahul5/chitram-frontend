@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { apiClient } from "@/lib/apiClient";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AdminUsers from "./AdminUsers";
 import AdminOperations from "./AdminOperations";
 import { MasonryFeed } from "@/components/feed/MasonryFeed";
@@ -53,7 +54,18 @@ function mergeDashboard(incoming: WsAdminDashboard): AdminDashboard {
 }
 
 export default function AdminWorkspace() {
-    const [view, setView] = useState<View>("home");
+    return (
+        <Suspense fallback={<AdminWorkspaceLoading />}>
+            <AdminWorkspaceContent />
+        </Suspense>
+    );
+}
+
+function AdminWorkspaceContent() {
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const view: View = searchParams.get("view") === "panel" ? "panel" : "home";
     const [dashboard, setDashboard] = useState<AdminDashboard | null>(null);
     const [loadingDashboard, setLoadingDashboard] = useState(true);
     const [dashboardError, setDashboardError] = useState<string | null>(null);
@@ -68,6 +80,14 @@ export default function AdminWorkspace() {
     const [savingRecommendationSetting, setSavingRecommendationSetting] = useState(false);
     const [dbOverview, setDbOverview] = useState<DatabaseOverview | null>(null);
     const backendUrl = (process.env.NEXT_PUBLIC_API_URL ?? "https://chitram-backend-og9p.onrender.com/api").replace(/\/api\/?$/, "");
+
+    const selectView = (nextView: View) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (nextView === "panel") params.set("view", "panel");
+        else params.delete("view");
+        const query = params.toString();
+        router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    };
 
     // ── Initial REST loads ───────────────────────────────────────────────────
     useEffect(() => {
@@ -174,15 +194,15 @@ export default function AdminWorkspace() {
     return (
         <main className="min-h-screen bg-[#f5f1e9] text-[#1f2925]">
             <header className="sticky top-0 z-10 border-b border-[#d8ded8] bg-[#f5f1e9]/95 backdrop-blur">
-                <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-3 sm:gap-6 sm:px-6 sm:py-4 lg:px-10">
+                <div className="mx-auto flex max-w-7xl items-center gap-1.5 px-3 py-3 sm:gap-6 sm:px-6 sm:py-4 lg:px-10">
                     <Link className="shrink-0" href="/" aria-label="Chitram home">
-                        <img src="/name.png" alt="Chitram" className="h-10 w-36 translate-y-2 object-cover object-center sm:h-12 sm:w-44" />
+                        <img src="/name.png" alt="Chitram" className="h-9 w-32 translate-y-1 object-cover object-center sm:h-12 sm:w-44 sm:translate-y-2" />
                     </Link>
-                    <nav className="flex min-w-0 flex-1 items-center gap-1" aria-label="Admin navigation">
-                        <button className={`rounded-full px-2.5 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm ${view === "home" ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:bg-white"}`} onClick={() => setView("home")} type="button">
+                    <nav className="flex min-w-0 flex-1 items-center gap-0.5" aria-label="Admin navigation">
+                        <button className={`rounded-full px-2 py-1.5 text-[11px] font-semibold transition sm:px-4 sm:py-2 sm:text-sm ${view === "home" ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:bg-white"}`} onClick={() => selectView("home")} type="button">
                             Home
                         </button>
-                        <button className={`rounded-full px-2.5 py-2 text-xs font-semibold transition sm:px-4 sm:text-sm ${view === "panel" ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:bg-white"}`} onClick={() => setView("panel")} type="button">
+                        <button className={`rounded-full px-2 py-1.5 text-[11px] font-semibold transition sm:px-4 sm:py-2 sm:text-sm ${view === "panel" ? "bg-[#1f2925] text-white" : "text-[#68736d] hover:bg-white"}`} onClick={() => selectView("panel")} type="button">
                             Panel
                         </button>
                     </nav>
@@ -191,7 +211,7 @@ export default function AdminWorkspace() {
 
                     <span className="hidden rounded-full bg-[#e9eee8] px-3 py-2 text-xs font-semibold text-[#68736d] sm:inline-flex">Admin workspace</span>
                     <button
-                        className="rounded-full border border-[#d8ded8] px-2 py-1.5 text-[11px] font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition active:scale-95 sm:px-3 sm:text-xs"
+                        className="whitespace-nowrap rounded-full border border-[#d8ded8] px-2 py-1.5 text-[11px] font-semibold text-[#68736d] hover:border-[#1f2925] hover:text-[#1f2925] transition active:scale-95 sm:px-3 sm:py-2 sm:text-xs"
                         onClick={async () => {
                             try {
                                 await apiClient<void>("/auth/logout", { method: "POST" });
@@ -264,6 +284,10 @@ export default function AdminWorkspace() {
             </div>
         </main>
     );
+}
+
+function AdminWorkspaceLoading() {
+    return <main className="min-h-screen bg-[#f5f1e9]" aria-label="Loading admin workspace" />;
 }
 
 // ── Live indicator dot ───────────────────────────────────────────────────────

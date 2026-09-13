@@ -349,9 +349,9 @@ export default function ProfilePage() {
             profile={profile}
             topActions={
                 <>
-                    {profile.isAdmin && <Link href="/admin" className="rounded-full bg-[#1f2925] px-3 py-2 text-center text-xs font-semibold text-white transition hover:bg-[#2e3b36] sm:px-4 sm:text-sm">Admin Panel</Link>}
-                    <Link href="/" className="rounded-full border border-[#d8ded8] px-3 py-2 text-center text-xs font-semibold text-[#68736d] transition hover:border-[#1f2925] hover:text-[#1f2925] sm:px-4 sm:text-sm">Gallery</Link>
-                    <button onClick={handleSignOut} className="rounded-full border border-[#d8ded8] px-3 py-2 text-center text-xs font-semibold text-[#68736d] transition hover:border-[#1f2925] hover:text-[#1f2925] sm:px-4 sm:text-sm" type="button">Sign out</button>
+                    {profile.isAdmin && <Link href="/admin" className="whitespace-nowrap rounded-full bg-[#1f2925] px-2 py-1.5 text-center text-[11px] font-semibold text-white transition hover:bg-[#2e3b36] sm:px-4 sm:py-2 sm:text-sm">Admin Panel</Link>}
+                    <Link href="/" className="whitespace-nowrap rounded-full border border-[#d8ded8] px-2 py-1.5 text-center text-[11px] font-semibold text-[#68736d] transition hover:border-[#1f2925] hover:text-[#1f2925] sm:px-4 sm:py-2 sm:text-sm">Gallery</Link>
+                    <button onClick={handleSignOut} className="whitespace-nowrap rounded-full border border-[#d8ded8] px-2 py-1.5 text-center text-[11px] font-semibold text-[#68736d] transition hover:border-[#1f2925] hover:text-[#1f2925] sm:px-4 sm:py-2 sm:text-sm" type="button">Sign out</button>
                 </>
             }
             profileActions={
